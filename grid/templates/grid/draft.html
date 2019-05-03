@@ -1,0 +1,37 @@
+{% extends 'grid/base.html' %}
+{% block content %}
+<div class="container">
+      <div class = "col-6" id="graph-container"></div>      
+      <script>
+        //sigma object
+        var s = new sigma({
+            renderer:{
+                container: document.getElementById('graph-container'),
+                type: 'canvas'
+            },
+            settings: {
+                mouseEnabled: false
+                touchEnabled: false
+            }
+        });
+        //graph object
+        var graph = {
+            nodes:[
+                { id: "n1", label: "1", x: 0, y: 0, size: 3, color: '#008cc2' },
+                { id: "n2", label: "2", x: 0, y: 1, size: 3, color: '#008cc2' },
+                { id: "n3", label: "3", x: 1, y: 1, size: 3, color: '#008cc2' }
+            ],
+            edges:[
+                { id: "e0", source: "n0", target: "n1", color: '#282c34', type:'line', size:0.5 },
+                { id: "e0", source: "n1", target: "n2", color: '#282c34', type:'line', size:0.5 },
+                { id: "e0", source: "n2", target: "n3", color: '#282c34', type:'line', size:0.5 }
+            ]
+        }
+
+        // Load the graph in sigma
+        s.graph.read(graph);
+        // draw it
+        s.refresh();
+      </script>
+</div>
+{% endblock %}

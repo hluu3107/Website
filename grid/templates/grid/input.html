@@ -1,0 +1,89 @@
+{% extends 'grid/base.html' %}
+{% load static %}
+{% block content %}
+	<div id='graph-container'></div>
+     <div class="row btn-run">   
+        <button class="btn">Run</button>
+    </div>
+    <div id="error-msg"></div>
+    <script type="text/javascript" src="{% static 'js/sigma.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+	<script>
+    	var raw = "{{graph}}";
+        var eclickcolor = '#e62739';
+        var edefaultcolor = '#e1e8f0';
+        var g = JSON.parse(raw.replace(/(&quot\;)/g,"\""));    	
+        s = new sigma({
+          graph: g,
+          renderer: {
+            container: document.getElementById('graph-container'),
+            type: 'canvas'
+          },
+          settings: {
+            doubleClickEnabled: false,
+            minEdgeSize: 0.5,
+            maxEdgeSize: 4,
+            enableEdgeHovering: true,
+            edgeHoverColor: 'default',
+            defaultEdgeHoverColor: '#9068be',
+            edgeHoverSizeRatio: 1,
+            edgeHoverExtremities: true,
+            defaultEdgeColor:'#6ed3cf',
+            enableCamera: false
+          }
+        });
+        s.refresh();
+       
+        // Bind the events:
+        // s.bind('overNode outNode clickNode doubleClickNode rightClickNode', function(e) {
+        //   console.log(e.type, e.data.node.label, e.data.captor);
+        // });
+        // s.bind('overEdge outEdge clickEdge doubleClickEdge rightClickEdge', function(e) {
+        //   console.log(e.type, e.data.edge, e.data.captor);
+        // });
+        s.bind('clickEdge doubleClickEdge', function(e) {
+            if(e.data.edge.mutable){
+                if(!e.data.edge.selected){
+                    e.data.edge.color = eclickcolor;
+                    e.data.edge.selected = true;
+                }else{
+                    e.data.edge.color = edefaultcolor;
+                    e.data.edge.selected = false;
+                }
+                    
+            }
+            console.log(e.data.edge)
+            s.refresh();                    
+        });
+    
+    //ajax request to get graph back to views
+    $(document).ready(function (){   
+      $("button").click(function(){
+        var graph = {
+            'nodes': s.graph.nodes(),
+            'edges': s.graph.edges()
+        }
+
+        $.ajax({
+            url: '/input',
+            type: 'POST',
+            data: {
+                status: 1,
+                graph: JSON.stringify(graph)
+            },
+            dataType: 'json',
+            success: function (data) {
+                // var msg = $(".side-nav-right").text();
+                if (data=='0'){
+                    $("#error-msg").text("Grid is not connected");
+                }else{
+                    window.location.href = '/result';
+                }                
+            }
+        });//end ajax request
+      });//end click button
+    });   
+    </script>   
+{% endblock %}
+
+
