@@ -114,6 +114,7 @@ def draw(request):
 		### Get size from session variable and render empty grid of given size
 		data = request.session.get('data')		
 		graph = createEmptyGrid(data)
+		data['graph'] = graph
 		### render empty grid		
 		#return render(request,'grid/draw_grid.html',{'graph':graph})
 	elif request.session['draw']==False:
@@ -125,4 +126,4 @@ def draw(request):
 		data['vList'] = vString
 		graph = getJsonGraph(grid)
 		data['graph'] = graph
-	return render(request,'grid/draw_grid.html',{'graph':graph})
+	return render(request,'grid/draw_grid.html',{'data':data})
