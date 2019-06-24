@@ -1,0 +1,7 @@
+grid/__pycache__/
+mysite/__pycache__/
+
+*.py[cod]
+
+grid/migration/
+

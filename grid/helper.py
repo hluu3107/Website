@@ -4,21 +4,16 @@ from collections import defaultdict
 def process_input(inputFile,size):
 	#process input file and return adjacency matrix
 	nIn = 2
-	#f = open(str(inputFile), "r")
-	#f = inputFile
 	f = ''
 	adj_matrix = {}
 	count = 0
 	order = []
-	if size==8:
-		order = [-1,-4,-5,-6,-8,-2,-3,3,4,5,6,8,1]
-	elif size==12:
-		order = [-1,-4,-10,-12,12,10,4,1]
 
-	for i in range(1,size+1):
-		order.append(-i);
+	for i in range(-1,-size-1,-1):
+		order.append(i)
 	for i in range(size,0,-1):
-		order.append(i);
+		order.append(i)
+
 	for line in inputFile:
 		f = f + line.decode()
 
@@ -32,7 +27,6 @@ def process_input(inputFile,size):
 			neighbors.sort(key=lambda x:order.index(x-node1))						
 			adj_matrix[node1] = neighbors
 		count += len(adj_matrix[node1])
-	#print(f'count is {count}')			
 	return int(count/2),adj_matrix
 
 def list_diff(list1,list2):

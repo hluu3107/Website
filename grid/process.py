@@ -3,7 +3,7 @@ import json
 import queue
 import math
 def createGrid(data):
-	adjMatrix = getMatrixJson(data.get('adjMatrix'))
+	adjMatrix = getMatrixJson(data)
 	w = float(data.get('w'))
 	l = float(data.get('l'))
 	diffCoeff = float(data.get('diffCoeff'))
@@ -28,10 +28,17 @@ def solveGrid(grid):
 	grid.solveConcentration()
 
 def getMatrixJson(data):
-	matrix = json.loads(data)
+	matrix = json.loads(data.get('adjMatrix'))
+	order = []
+	size = int(data.get('size'))
+	for i in range(-1,-size-1,-1):
+		order.append(i)
+	for i in range(size,0,-1):
+		order.append(i)
 	adjMatrix = {}
-	for key,value in matrix.items():
-		adjMatrix[int(key)] = value
+	for node,neighbors in matrix.items():
+		neighbors.sort(key=lambda x:order.index(x-int(node)))
+		adjMatrix[int(node)] = neighbors
 	return adjMatrix
 
 def getMatrixInput(data):

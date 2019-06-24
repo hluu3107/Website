@@ -108,14 +108,11 @@ class Grid:
 					#self.concentration[node] = nodeGradient
 					#print(f'Set {node} to {nodeGradient}')
 				
-	def getNodeGradient(self,node,splitList,splitNode=0):				
+	def getNodeGradient(self,node,splitList,splitNode=0):
 		classificationList = self.nodeClassification[node]
 		nodeType = classificationList[0]	
 		inNode = classificationList[1]
 		outNode = classificationList[2]
-		sub_length = 0.8
-		start_length = 0.2
-		end_length = 0.4
 		#print(f'	GET {node} + {nodeType}')
 		if node in self.concentration and nodeType!='split' and nodeType!='mix':
 			#print(f'	get gradient of {node}: {self.concentration[node]}')
@@ -125,18 +122,7 @@ class Grid:
 				#calculate split				
 				inGrad = self.concentration[node]
 				#print(f'	Calculate split of {node}')
-				#flip output order
-				if len(outNode)==2:					
-					if ((outNode[0]==node-self.size) and (outNode[1]==node+1)) or ((outNode[0]==node-1) and (outNode[1]==node-self.size)):
-						outNode[0],outNode[1] = outNode[1],outNode[0]					
-				if len(outNode)==3:				
-					if ((outNode[0]==node-self.size) and (outNode[1]==node+self.size)) and outNode[2]==node+1:
-						outNode[0],outNode[1],outNode[2] = node+self.size,node+1,node-self.size		
-				outVel = [abs(self.velocity[(node,out)]) for out in outNode]
-				outGrad = calculateSplit(inGrad,outVel,self.w)
-				for i in range(len(outGrad)):
-					splitList[(node,outNode[i])] = outGrad[i]
-					#print(f'{node}-{outNode[i]}: {outGrad[i]}')
+				self.updateSplitList(splitList,node,inNode,outNode,inGrad)				
 			#print(f'	get gradient of {node} from splitList: {splitList[(node,splitNode)]}')
 			return splitList[(node,splitNode)]
 		
@@ -145,92 +131,118 @@ class Grid:
 			result = Gradient(0,0,0,self.w,self.w)
 		#only one in. Calculate straight
 		elif len(inNode)==1:			
-			#print(f'straight from {inNode} to {node}')
+			#print(f'			straight from {inNode} to {node}')
 			inNodeGrad = self.getNodeGradient(inNode[0],splitList,node)
 			inNodeType = self.nodeClassification[inNode[0]][0]			
-			
 			if inNode[0] not in self.concentration:
-				#print(f'	Set {inNode[0]} to {inNodeGrad}')
 				self.concentration[inNode[0]] = inNodeGrad
-			
 			if inNodeType == 'split' or inNodeType == 'mix':
 				inNodeOut = self.nodeClassification[inNode[0]][2]
+				inNodeIn = self.nodeClassification[inNode[0]][1]
 				if (inNode[0],node) not in splitList:
-					#print(f'	Calculate split of {inNode[0]} in straight')
-									
-					if len(inNodeOut)==2:						
-						if ((inNodeOut[0]==inNode[0]-self.size) and (inNodeOut[1]==inNode[0]+1)) or (inNodeOut[0]==inNode[0]-1 and inNodeOut[1]==inNode[0]-self.size):
-							inNodeOut[0],inNodeOut[1] = inNodeOut[1],inNodeOut[0]
-					if len(inNodeOut)==3:				
-						if ((inNodeOut[0]==inNode[0]-self.size) and (inNodeOut[1]==inNode[0]+self.size)) and inNodeOut[2]==inNode[0]+1:
-							inNodeOut[0],inNodeOut[1],inNodeOut[2] = inNode[0]+self.size,inNode[0]+1,inNode[0]-self.size							
-					
-					outVel = [abs(self.velocity[(inNode[0],out)]) for out in inNodeOut]
-					outGrad = calculateSplit(inNodeGrad,outVel,self.w)
-					for i in range(len(outGrad)):
-						splitList[(inNode[0],inNodeOut[i])] = outGrad[i]
+					self.updateSplitList(splitList,inNode[0],inNodeIn,inNodeOut,inNodeGrad)
 				inNodeGrad = splitList[(inNode[0],node)]
-			
-			length = self.l
+
+			length = self.l+self.w/2
+			# if inNodeType == 'split' or inNodeType == 'mix' or inNodeType == 'join':
+			# 	length = sub_length + self.l - start_length - end_length
 			if inNodeType == 'split' or inNodeType == 'mix' or inNodeType == 'join':
-				length = sub_length + self.l - start_length - end_length
+				length = self.l
 			dT = calculateTime(length,self.velocity[(inNode[0],node)])
 			result = calculateStraight(inNodeGrad,dT,self.diffCoeff,self.w)
+			#print(f'			straight result of {inNode}: {result}')
 		#2,3 inflow. Join			
 		else:
 			inNodeGrads = []
+			#make sure orientation is correct
+			#print(f'			Join from {inNode} to {outNode}')
 			if len(inNode)==3:
-				#if join 3 -1,-size,+size
-				if inNode[2]==node+self.size:
+				if outNode[0]==node+1:
+					inNode[0],inNode[1],inNode[2] = inNode[2],inNode[0],inNode[1]
+					#print(f'case join 3.1 in: {inNode}, out: {outNode[0]}')
+				elif outNode[0]==node-1:
+					inNode[1],inNode[2] = inNode[2],inNode[1]
+					#print(f'case join 3.2 in: {inNode}, out: {outNode[0]}')
+				elif outNode[0]==node-self.size:
+					inNode[0],inNode[2] = inNode[2],inNode[0]
+					#print(f'case join 3.3 in: {inNode}, out: {outNode[0]}')
+			elif len(inNode)==2:
+				if (inNode[0]==node+self.size and inNode[1]==node+1) or\
+					(inNode[0]==node-1 and inNode[1]==node+self.size):
 					inNode[0],inNode[1] = inNode[1],inNode[0]
-			elif len(inNode)==2 and len(outNode)==1:
-				if inNode[1]==node+self.size and outNode[0]==node+1:
+					#print(f'case join 2.1 in: {inNode}, out: {outNode[0]}')
+				elif inNode[0]==node-self.size and inNode[1]==node+self.size and outNode[0]==node+1:
 					inNode[0],inNode[1] = inNode[1],inNode[0]
+					#print(f'case join 2.2 in: {inNode}, out: {outNode[0]}')
+				elif inNode[0]==node-1 and inNode[1]==node+1 and outNode[0]==node-self.size:
+					inNode[0],inNode[1] = inNode[1],inNode[0]
+				elif self.nodeClassification[inNode[0]][0]=='inlet' and inNode[1]==node+self.size and outNode[0]==node+1:
+					inNode[0],inNode[1] = inNode[1],inNode[0]
+					#print(f'case join 2.3 in: {inNode}, out: {outNode[0]}')
 
 			inVel = [abs(self.velocity[(n,node)]) for n in inNode]			
 			for k in range (len(inNode)):
 				n = inNode[k]
 				#after getting all input, calculate straight then join
 				inGrad = self.getNodeGradient(n,splitList,node)
-				nType = self.nodeClassification[n][0]	
-				
-				if n not in self.concentration:
-					#print(f'	Set {n} to {inGrad}')
-					self.concentration[n] = inGrad
-
+				nType = self.nodeClassification[n][0]
 				if nType == 'split' or nType == 'mix':
 					inNodeOut = self.nodeClassification[n][2]
+					inNodeIn = self.nodeClassification[n][1]
 					if (n,node) not in splitList:
-						#print(f'	Calculate split of {n} in join')
-						if len(inNodeOut)==2:
-							if (inNodeOut[0]==n-self.size and inNodeOut[1]==n+1) or (inNodeOut[0]==n-1 and inNodeOut[1]==n-8):
-								inNodeOut[0],inNodeOut[1] = inNodeOut[1],inNodeOut[0]							
-						if len(inNodeOut)==3:				
-							if ((inNodeOut[0]==n-self.size) and (inNodeOut[1]==n+self.size)) and inNodeOut[2]==n+1:
-								inNodeOut[0],inNodeOut[1],inNodeOut[2] = n+self.size,n+1,n-self.size
-						outVel = [abs(self.velocity[(n,out)]) for out in inNodeOut]
-						outGrad = calculateSplit(inGrad,outVel,self.w)
-						for i in range(len(outGrad)):
-							splitList[(n,inNodeOut[i])] = outGrad[i]
-					inGrad = splitList[(n,node)]				
-				
-				length = self.l
+						self.updateSplitList(splitList,n,inNodeIn,inNodeOut,inGrad)
+					inGrad = splitList[(n,node)]
+				length = self.l+self.w/2
 				if nType == 'split' or nType == 'mix' or nType == 'join':
-					length = sub_length + self.l - start_length - end_length
-				
+					length = self.l				
 				dT = calculateTime(length,inVel[k])
 				inNodeAfter = calculateStraight(inGrad,dT,self.diffCoeff,self.w)
-				inNodeGrads.append(inNodeAfter)
-					
-			# print(f'Join from {inNode} to {node}')
-			# for grad in inNodeGrads:
-			# 	print(grad)
-			result = calculateJoin(inNodeGrads,inVel,self.w)
+				inNodeGrads.append(inNodeAfter)					
+			
+			joinedProfile = calculateJoin(inNodeGrads,inVel,self.w)
+			eT = calculateTime(self.w/2,sum(inVel))
+			result = calculateStraight(joinedProfile,eT,self.diffCoeff,self.w)
 		if node not in self.concentration:
 			#print(f'	Set {node} to {result}')
 			self.concentration[node] = result			
 		return result	
-		
+	
+	def updateSplitList(self,splitList,node,inNode,outNode,inGrad):
+		if len(outNode)==3:					
+			if inNode[0]==node-1:
+				outNode[0], outNode[1],outNode[2] = outNode[1],outNode[2],outNode[0]
+				#print(f'case3.1 in: {inNode[0]}, out: {outNode}')
+			elif inNode[0]==node+1:
+				outNode[0],outNode[1] = outNode[1],outNode[0]
+				#print(f'case3.2 in: {inNode[0]}, out: {outNode}')
+			elif inNode[0]==node+self.size:
+				outNode[0],outNode[2] = outNode[2],outNode[0]
+				#print(f'case3.3 in: {inNode[0]}, out: {outNode}')
+		elif len(outNode)==2:
+			if (outNode[0]==node-1 and outNode[1]==node-self.size) or\
+			(outNode[0]==node-self.size and outNode[1]==node+1):
+				outNode[0],outNode[1] = outNode[1],outNode[0]
+				#print(f'case2.1 in: {inNode[0]}, out: {outNode}')
+			elif (outNode[0]==node-self.size and outNode[1]==node+self.size and inNode[0]==node-1) or\
+			(outNode[0]==node-1 and outNode[1]==node+1 and inNode[0]==node+self.size):
+				outNode[0],outNode[1] = outNode[1],outNode[0]
+				#print(f'case2.2 in: {inNode[0]}, out: {outNode}')
+			elif self.nodeClassification[outNode[1]][0]=='outlet' and outNode[0]==node-self.size and\
+			inNode[0]==node-1:
+				outNode[0],outNode[1] = outNode[1],outNode[0]
+				#print(f'case2.3 in: {inNode[0]}, out: {outNode}')
+		outVel = [abs(self.velocity[(node,out)]) for out in outNode]
+		splitGrad = calculateSplit(inGrad,outVel,self.w)
+		outGrad = []
+		for i in range(len(outNode)):
+			dT = calculateTime(self.w/2,outVel[i])
+			oGrad = calculateStraight(splitGrad[i],dT,self.diffCoeff,self.w)
+			outGrad.append(oGrad)
+
+		for i in range(len(outGrad)):
+			splitList[(node,outNode[i])] = outGrad[i]
+			#print(f'			Split {node}-{outNode[i]}: {outGrad[i]}')	
+	
 	def classifyNode(self):
 		result = {}
 		for node,neighbors in self.adjMatrix.items():
@@ -270,42 +282,48 @@ class Grid:
 		return result
 
 def calculateStraight(inGrad, dT, diffCoeff,w):	
+	const = 12
 	#if shape 1
 	if inGrad.a == inGrad.b:
 		return inGrad
 	result = Gradient(inGrad.a,inGrad.b,inGrad.d1,inGrad.d2,w)
 	shape = inGrad.shape()
 	area = inGrad.calculateArea()
-	lp_diff = 2*math.sqrt(diffCoeff*abs(dT))
+	l_diff = (inGrad.d2-inGrad.d1)/2
+	t = l_diff**2/((const**2)*diffCoeff)
+	lp_diff = const*math.sqrt(diffCoeff*(abs(dT)+t))
+	diff = (lp_diff-l_diff)
 	#if shape 3 has both head and tail 
-	if shape == 3:		
-		d1p = inGrad.d1-lp_diff
-		d2p = inGrad.d2+lp_diff
+	if shape == 3:
+		d1p = inGrad.d1-diff
+		d2p = inGrad.d2+diff
 		if d1p>=0 and d2p<=w:
 			result.d1 = d1p
 			result.d2 = d2p
 		#not  in correct form
 		elif d1p<0 and (d2p <= w or (d2p-w)<abs(d1p)):
-			remain = abs(d1p)
-			t = inGrad.d1**2/(4*diffCoeff)
-			newT = dT - t
+			remain = abs(d1p)			
+			cur_l = (d2p-remain)/2
+			cur_t = cur_l**2/((const**2)*diffCoeff)
+			newT = (dT+t) - cur_t
 			newInGrad = Gradient(inGrad.a,inGrad.b,0,d2p-remain,w)
 			#print(f'Straight Not in correct form 1')
 			newResult = calculateStraight(newInGrad,newT,diffCoeff,w)
 			result = newResult
 		else: #d2p > w and (d1p>=0 or (d2p-w)>=abs(d1p))
 			remain = d2p-w
-			t = (w-inGrad.d2)**2/(4*diffCoeff)
-			newT = dT - t
+			cur_l = (w-d1p-remain)/2
+			cur_t = cur_l**2/((const**2)*diffCoeff)
+			newT = (dT+t) - cur_t
 			newInGrad = Gradient(inGrad.a,inGrad.b,d1p+remain,w,w)
-			#print(f'Straight Not in correct form 2')
+			#print(f'Straight Not in correct form 2, oldT {dT} newT {newT}')
 			newResult = calculateStraight(newInGrad,newT,diffCoeff,w)
 			result = newResult
 	#if shape 2 linear line
 	elif shape == 2:
-		m = lp_diff/2
+		m = diff
 		ap = inGrad.a+(m*(inGrad.b-inGrad.a))/(w+2*m)
-		bp = inGrad.b-(m*(inGrad.b-inGrad.a))/(w+2*m)
+		bp = inGrad.a+((w+m)*(inGrad.b-inGrad.a))/(w+2*m)
 		if ap >= bp:
 			result.a = ap
 			result.b = bp			
@@ -317,40 +335,43 @@ def calculateStraight(inGrad, dT, diffCoeff,w):
 			#print(f'Straight Not in correct form 3')		
 	#if shape 4
 	elif shape == 4:
-		d1p = inGrad.d1 - lp_diff		
+		#d1p = inGrad.d1 - lp_diff
+		d1p = inGrad.d1-diff
+		#print(f'					d1p {d1p}')	
 		if d1p >=0:
 			bp = 2*(area-inGrad.a*d1p)/(w-d1p)-inGrad.a
 			result.b = bp
 			result.d1 = d1p
 		else:
 			#not in correct form
-			t = inGrad.d1**2/(4*diffCoeff)
-			newT = dT - t		
+			cur_l = w/2
+			cur_t = cur_l**2/((const**2)*diffCoeff)
+			newT = (dT+t) - cur_t		
 			bp = 2*area/w-inGrad.a
 			newInGrad = Gradient(inGrad.a,bp,0,w,w)
 			#print(f'Straight Not in correct form 4')
 			newResult = calculateStraight(newInGrad,newT,diffCoeff,w)
 			result = newResult
 	elif shape == 5:
-		d2p = inGrad.d2 + lp_diff
+		d2p = inGrad.d2 + diff
 		if d2p <=w:
 			ap = 2*(area-inGrad.b*(w-d2p))/d2p - inGrad.b
 			result.a = ap
 			result.d2 = d2p
 		else:
 			#not in correct form
-			t = (w-inGrad.d2)**2/(4*diffCoeff)
-			newT = dT - t
+			cur_l = w/2
+			cur_t = cur_l**2/((const**2)*diffCoeff)
+			newT = (dT+t) - cur_t		
 			ap = 2*area/w - inGrad.b
 			newInGrad = Gradient(ap,inGrad.b,0,w,w)
 			#print(f'Straight Not in correct form 5')
 			newResult = calculateStraight(newInGrad,newT,diffCoeff,w)
 			result = newResult
-
-	totalArea = inGrad.calculateArea()
-	resultArea = result.calculateArea()	
-	if abs(resultArea-totalArea) > 1e-9:
-		print(f'STRAIGHT not correct. Old area = {totalArea:.6f} New area = {resultArea:.6f}')		
+	# totalArea = inGrad.calculateArea()
+	# resultArea = result.calculateArea()	
+	# if abs(resultArea-totalArea) > 1e-9:
+	# 	print(f'STRAIGHT not correct. Old area = {totalArea:.6f} New area = {resultArea:.6f}')		
 	return result
 
 def calculateSplit(inGrad,outVel,w):
@@ -441,7 +462,10 @@ def calculateSplit(inGrad,outVel,w):
 		print(f'SPLIT not correct original Area: {area:.6f} new area: {newarea:.6f}')
 	return result
 
-def calculateJoin(inGrad,inVel,w):	
+def calculateJoin(inGrad,inVel,w):
+	print('Join: ')
+	for i in inGrad:
+		print(f'	{i}')
 	sumV = sum(v for v in inVel)
 	totalArea = 0
 	for i in range (len(inVel)):

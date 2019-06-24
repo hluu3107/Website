@@ -63,13 +63,7 @@
         });
         s.refresh();
         console.log("{{data.vList}}}");
-        // Bind the events:
-        // s.bind('overNode outNode clickNode doubleClickNode rightClickNode', function(e) {
-        //   console.log(e.type, e.data.node.label, e.data.captor);
-        // });
-        // s.bind('overEdge outEdge clickEdge doubleClickEdge rightClickEdge', function(e) {
-        //   console.log(e.type, e.data.edge, e.data.captor);
-        // });
+        
         s.bind('clickEdge doubleClickEdge', function(e) {
             if(e.data.edge.mutable){
                 if(!e.data.edge.selected){
@@ -109,8 +103,12 @@
                     $("#vresult").text(""); 
                 }else{
                     $("#error-msg").text("");
-                    $("#v1").text(data.vList[0].toFixed(2));$("#v2").text(data.vList[1].toFixed(2));$("#v3").text(data.vList[2].toFixed(2));
-                    $("#c1").text(data.cList[0].toFixed(2));$("#c2").text(data.cList[1].toFixed(2));$("#c3").text(data.cList[2].toFixed(2));  
+                    $("#v1").text(data.vList[0].toFixed(2));
+                    $("#v2").text(data.vList[1].toFixed(2));
+                    $("#v3").text(data.vList[2].toFixed(2));
+                    $("#c1").text(data.cList[0].toFixed(2));
+                    $("#c2").text(data.cList[1].toFixed(2));
+                    $("#c3").text(data.cList[2].toFixed(2));  
                     var g = data.graph;
                     s.graph = g;
                     s.refresh();                                   

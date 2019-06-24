@@ -122,6 +122,7 @@ def draw(request):
 		grid = createGrid(data)		
 		solveGrid(grid)
 		cString,vString = getResult(grid)
+		print(f'c: {cString}), v: {vString}')
 		data['cList'] = cString
 		data['vList'] = vString
 		graph = getJsonGraph(grid)
