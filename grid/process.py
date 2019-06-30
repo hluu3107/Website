@@ -142,73 +142,31 @@ def getJsonGraph2(grid):
 	return jsong
 
 def createEmptyGrid(data):
-	size = int(data.get('size'))
-	nIn = 2
-	nOut = 3
+	nr = int(data.get('nr'))
+	nc = int(data.get('nc'))
 	nodes = []
 	edges = []
 	nsize = 2
 	nColor = "#e1e8f0"	
 	eclickcolor = "#e62739"
 	esize = 0.5
-	nNode = int(size * size + nIn + nOut)
-	# create input nodes
-	if(size>=7):
-		node1 = {"id": str(nIn-1), "x": 2, "y": 0, "size": nsize, "color":nColor}
-		node2 = {"id": str(nIn), "x": size-3, "y": 0, "size": nsize, "color":nColor}
-	else:
-		node1 = {"id": str(nIn-1), "x": 1, "y": 0, "size": nsize, "color":nColor}
-		node2 = {"id": str(nIn), "x": size-2, "y": 0, "size": nsize, "color":nColor}
-
-	nodes.extend([node1,node2])
-
-	# create normal nodes
-	for i in range(nIn+1,nNode-nOut+1):
-		node = {"id": str(i), "x": (i-3)%size, "y":int((i-3)/size+1), "size": nsize, "color":nColor}
+	nNode = int((nr+2) * nc)
+	# create nodes
+	for i in range(1,nNode+1):
+		node = {"id": str(i), "x": (i-1)%nc, "y":int((i-1)/nc), "size": nsize, "color":nColor}
 		nodes.append(node)
-	#create output nodes
-	nodeo1 = {"id": str(nNode-2), "x": 0, "y": size+1, "size": nsize, "color":nColor}
-	nodeo2 = {"id": str(nNode-1), "x": int(size/2), "y": size+1, "size": nsize, "color":nColor}
-	nodeo3 = {"id": str(nNode), "x": size-1, "y": size+1, "size": nsize, "color":nColor}
-	nodes.extend([nodeo1,nodeo2,nodeo3])
-	
-	#create input edges
-	if(size>=7):
-		ine1 = {"id": str(nIn-1)+"-"+str(nIn+3), "source":str(nIn-1), "target":str(nIn+3), "size": esize, \
-			"selected": True, "color": eclickcolor, "mutable": False}
-		ine2 = {"id": str(nIn)+"-"+str(size), "source":str(nIn), "target":str(size), "size": esize, \
-			"selected": True, "color": eclickcolor, "mutable": False}
-	else:
-		ine1 = {"id": str(nIn-1)+"-"+str(nIn+2), "source":str(nIn-1), "target":str(nIn+2), "size": esize, \
-			"selected": True, "color": eclickcolor, "mutable": False}
-		ine2 = {"id": str(nIn)+"-"+str(size+1), "source":str(nIn), "target":str(size+1), "size": esize, \
-			"selected": True, "color": eclickcolor, "mutable": False}
-	edges.extend([ine1,ine2])
-
-	#create normal edge
-	for snode in range(nIn+1,nNode-nOut+1):
+	#create normal edges
+	for snode in range(nc+1,nNode-nc+1):
 		#create horizontal edges
-		if (snode-nIn)%size!=0:
+		if snode%nc!=0:
 			edge = {"id": str(snode)+"-"+str(snode+1), "source": str(snode), "target": str(snode+1), \
 			"size": esize, "selected": False, "mutable": True}
 			edges.append(edge)
 		#create vertical edges
-		if int((snode-nIn-1)/size+1) <= (size-1):
-			edge = {"id": str(snode)+"-"+str(snode+size), "source": str(snode), "target": str(snode+size), "size": esize, \
+		if int((snode-1)/nc) < nr:
+			edge = {"id": str(snode)+"-"+str(snode+nc), "source": str(snode), "target": str(snode+nc), "size": esize, \
 			"mutable": True, "selected": False}
-			edges.append(edge)
-	#create output edges
-	oute1 = {"id": str(nNode-2)+"-"+str(nNode-2-size), "source":str(nNode-2), "target":str(nNode-2-size), "size": esize, \
-			"selected": True, "color": eclickcolor, "mutable": False}
-	oute2 = {"id": str(nNode-1)+"-"+str(nNode-2-int((size+1)/2)), "source":str(nNode-1), "target":str(nNode-2-int((size+1)/2)), "size": esize, \
-			"selected": True, "color": eclickcolor, "mutable": False}
-	oute3 = {"id": str(nNode)+"-"+str(nNode-nIn-1), "source":str(nNode), "target":str(nNode-nIn-1), "size": esize, \
-			"selected": True, "color": eclickcolor, "mutable": False}
-	edges.extend([oute1,oute2,oute3])
-
-	# for node in nodes:
-	# 	node["x"] = node["x"]+1
-	# 	node["y"] = node["y"]+1
+			edges.append(edge)	
 	
 	graph = {"nodes": nodes, "edges": edges}
 	return json.dumps(graph)
