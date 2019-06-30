@@ -16,7 +16,7 @@ def user_input(request):
 				#Upload text file
 				input_file = request.FILES.get('input_file')
 				#TODO Verify input file
-				nEdge,adjMatrix = process_input(input_file,int(data.get('size')))			
+				nEdge,adjMatrix = process_input(input_file,int(data.get('nr')),int(data.get('nc')))			
 				data['nEdge'] = str(nEdge)
 				data['adjMatrix'] = json.dumps(adjMatrix)
 				request.session['data'] = data

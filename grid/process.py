@@ -3,24 +3,30 @@ import json
 import queue
 import math
 def createGrid(data):
-	adjMatrix = getMatrixJson(data)
+	nEdge,adjMatrix = getMatrixJson(data)
 	w = float(data.get('w'))
 	l = float(data.get('l'))
 	diffCoeff = float(data.get('diffCoeff'))
-	size = int(data.get('size'))
-	# nIn = int(data.get('nIn'))
-	# nOut = int(data.get('nOut'))
-	nIn = 2
-	nOut = 3
-	nNode = int(size * size + nIn + nOut)
-	#nEdge = int(data.get('nEdge'))
-	nEdge = reduceGrid(adjMatrix,nIn,nOut,nNode)
-	vel = float(data.get('initV'))
-	initC = [Gradient(1,1,0,0,w),Gradient(0,0,0,w,w)]
-	initV = []
-	for i in range(nIn):
-		initV.append(vel)
-	grid = Grid(size,nIn,nOut,nEdge,w,l,diffCoeff,adjMatrix,initV,initC)
+	nr = int(data.get('nr'))
+	nc = int(data.get('nc'))
+	#nNode = int(size * size + nIn + nOut)
+	#nEdge = reduceGrid(adjMatrix,nIn,nOut,nNode)
+	cstring = data.get('initC').split(",")
+	vstring = data.get('initV').split(",")
+	initC = {}
+	initV = {}
+	count = 1
+	for c in cstring:
+		if c=='x':
+			initC[count] = 0
+			initV[count] = 0
+		else:
+			initC[count] = float(c)
+			initV[count] = float(vstring[count-1])
+		count+=1
+	print(f'c: {initC}')
+	print(f'v: {initV}')	
+	grid = Grid(nr,nc,nEdge,w,l,diffCoeff,adjMatrix,initV,initC)
 	return grid
 
 def solveGrid(grid):
@@ -30,16 +36,19 @@ def solveGrid(grid):
 def getMatrixJson(data):
 	matrix = json.loads(data.get('adjMatrix'))
 	order = []
-	size = int(data.get('size'))
-	for i in range(-1,-size-1,-1):
+	nr = int(data.get('nr'))
+	nc = int(data.get('nc'))
+	for i in range(-1,-nc-1,-1):
 		order.append(i)
-	for i in range(size,0,-1):
+	for i in range(nc,0,-1):
 		order.append(i)
 	adjMatrix = {}
+	count = 0
 	for node,neighbors in matrix.items():
 		neighbors.sort(key=lambda x:order.index(x-int(node)))
 		adjMatrix[int(node)] = neighbors
-	return adjMatrix
+		count += len(neighbors)
+	return int(count/2),adjMatrix
 
 def getMatrixInput(data):
 	graph = json.loads(data)
@@ -65,32 +74,14 @@ def getJsonGraph(grid):
 	nsize = 2
 	nColor = "#6ed3cf"
 	esize = 0.5
-	size = grid.size
-	nIn = 2
-	nOut = 3
+	nr = grid.nRow
+	nc = grid.nCol
 	nNode = grid.nNode
-	# create input nodes
-	if(size>=7):
-		node1 = {"id": str(nIn-1), "x": 2, "y": 0, "size": nsize, "color":nColor}
-		node2 = {"id": str(nIn), "x": size-3, "y": 0, "size": nsize, "color":nColor}
-	else:
-		node1 = {"id": str(nIn-1), "x": 1, "y": 0, "size": nsize, "color":nColor}
-		node2 = {"id": str(nIn), "x": size-2, "y": 0, "size": nsize, "color":nColor}
-
-	# node1 = {"id": "1", "x": 2, "y": 0, "size": nsize, "color":nColor}
-	# node2 = {"id": "2", "x": grid.size-3, "y": 0, "size": nsize, "color":nColor}
-	nodes.extend([node1,node2])
-	# create normal nodes
-	for i in range(grid.nIn+1,grid.nNode-grid.nOut+1):
-		node = {"id": str(i), "x": (i-3)%grid.size, "y":int((i-3)/grid.size+1), "size": nsize, "color":nColor}
+	# create nodes
+	for i in range(1,grid.nNode+1):
+		node = {"id": str(i), "x": (i-1)%nc, "y":int((i-1)/nc), "size": nsize, "color":nColor}
 		nodes.append(node)
-	#create output nodes
-	nodeo1 = {"id": str(grid.nNode-2), "x": 0, "y": grid.size+1, "size": nsize, "color":nColor}
-	nodeo2 = {"id": str(nNode-1), "x": int(size/2), "y": size+1, "size": nsize, "color":nColor}
-	#nodeo2 = {"id": str(grid.nNode-1), "x": int((grid.size+1)/2), "y": grid.size+1, "size": nsize, "color":nColor}
-	nodeo3 = {"id": str(grid.nNode), "x": grid.size-1, "y": grid.size+1, "size": nsize, "color":nColor}
-	nodes.extend([nodeo1,nodeo2,nodeo3])
-	
+		#print(f'id: {i}, x: {(i-1)%nc}, y: {int((i-1)/nc)}')
 	#create edges
 	edgen = 1
 	for snode,neighbors in grid.adjMatrix.items():

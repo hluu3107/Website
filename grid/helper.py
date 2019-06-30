@@ -1,17 +1,15 @@
 import numpy as np
 from collections import defaultdict
 
-def process_input(inputFile,size):
-	#process input file and return adjacency matrix
-	nIn = 2
+def process_input(inputFile,nr,nc):
+	#process input file and return adjacency matrix	
 	f = ''
 	adj_matrix = {}
 	count = 0
 	order = []
-
-	for i in range(-1,-size-1,-1):
+	for i in range(-1,-nc-1,-1):
 		order.append(i)
-	for i in range(size,0,-1):
+	for i in range(nc,0,-1):
 		order.append(i)
 
 	for line in inputFile:
@@ -65,7 +63,9 @@ def getResult(grid):
 	string = ""
 	concentration_list = []
 	velocity_list = []
-	for i in range(grid.nNode-grid.nOut+1,grid.nNode+1):
+	for i in range(grid.nNode-grid.nCol+1,grid.nNode+1):
+		if not grid.adjMatrix[i]:
+			continue
 		(u,v) = (i,grid.adjMatrix[i][0])
 		c = grid.concentration[i].calculateConcentration()
 		vel = grid.velocity[(v,u)]

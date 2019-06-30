@@ -10,7 +10,18 @@
 	{% csrf_token %}
 	<div class="row">
 		<div class="col-md-2 col-md-offset-5">
-			{{form.size|as_crispy_field}}
+			{{form.nr|as_crispy_field}}
+		</div>
+		<div class="col-md-2 col-md-offset-5">
+			{{form.nc|as_crispy_field}}
+		</div>						
+	</div>
+	<div class="row">
+		<div class="col-md-2 col-md-offset-5">
+			{{form.initC|as_crispy_field}}
+		</div>
+		<div class="col-md-2 col-md-offset-5">
+			{{form.initV|as_crispy_field}}
 		</div>					
 	</div>
 	<div class="row">
@@ -24,10 +35,7 @@
 	<div class="row">
 		<div class="col-md-2 col-md-offset-4">
 			{{form.diffCoeff|as_crispy_field}}
-		</div>
-		<div class="col-md-2">
-			{{form.initV|as_crispy_field}}
-		</div>
+		</div>		
 	</div>
 	<div class = "row">
 		<div class="col-md-2 col-md-offset-5">
