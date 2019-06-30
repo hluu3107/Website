@@ -163,10 +163,16 @@ def createEmptyGrid(data):
 			"size": esize, "selected": False, "mutable": True}
 			edges.append(edge)
 		#create vertical edges
-		if int((snode-1)/nc) < nr:
+		if int((snode-1)/nc) <= nr:
 			edge = {"id": str(snode)+"-"+str(snode+nc), "source": str(snode), "target": str(snode+nc), "size": esize, \
 			"mutable": True, "selected": False}
 			edges.append(edge)	
+	
+	#create only vertical edges for input
+	for snode in range(1,nc+1):
+		edge = {"id": str(snode)+"-"+str(snode+nc), "source": str(snode), "target": str(snode+nc), "size": esize, \
+			"mutable": True, "selected": False}
+		edges.append(edge)
 	
 	graph = {"nodes": nodes, "edges": edges}
 	return json.dumps(graph)
