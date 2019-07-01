@@ -179,18 +179,26 @@ def createEmptyGrid(data):
 
 def verifyInputGraph(data):
 	adjMatrix, nEdge = getMatrixInput(data.get('graph'))
-	size = int(data.get('size'))
-	# nIn = int(data.get('nIn'))
-	# nOut = int(data.get('nOut'))
-	nIn = 2
-	nOut = 3
-	nNode = int(size * size + nIn + nOut)
+	nr = int(data.get('nr'))
+	nc = int(data.get('nc'))
+	nNode = int((nr+2) * nc)
 	inNodes = []
 	outNodes = []
-	for i in range(1,nIn+1):
-		inNodes.append(i)
-	for i in range(nNode-nOut+1,nNode+1):
-		outNodes.append(i)
+	
+	for i in range(1,nc+1):
+		if adjMatrix[i]:
+			inNodes.append(i)
+	# if no input
+	if not inNodes:
+		return False,adjMatrix, nEdge
+	
+	for i in range(nNode-nc+1,nNode+1):
+		if adjMatrix[i]:
+			outNodes.append(i)
+	# if no input
+	if not outNodes:
+		return False,adjMatrix, nEdge
+
 	#get graph cc
 	cc = getConnectedComponent(adjMatrix)
 	inout = inNodes + outNodes	
@@ -391,6 +399,7 @@ def findBiconnected(adjMatrix,time):
 		while st:
 			bc.append(st.pop())
 	return bc
+
 def bccHelper(node,parent,low,disc,st,adjMatrix,time):
 	children = 0
 	disc[node] = time[0]
