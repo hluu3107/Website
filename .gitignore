@@ -5,3 +5,6 @@ mysite/__pycache__/
 
 grid/migration/
 
+.ebextension/
+requirements.txt
+db.sqlite3

@@ -105,8 +105,8 @@ def draw(request):
 				grid = createGrid(data)		
 				solveGrid(grid)
 				cString,vString = getResult(grid)
-				data['cList'] = cString
-				data['vList'] = vString
+				resultList = list(zip(cString,vString))
+				data['resultList'] = resultList
 				graph = getJsonGraph(grid)
 				data['graph'] = graph
 				return HttpResponse(json.dumps(data))
@@ -122,9 +122,9 @@ def draw(request):
 		grid = createGrid(data)		
 		solveGrid(grid)
 		cString,vString = getResult(grid)
-		print(f'c: {cString}), v: {vString}')
-		data['cList'] = cString
-		data['vList'] = vString
+		resultList = zip(cString,vString)
+		data['resultList'] = resultList
+		#print(f'c: {cString}), v: {vString}')		
 		graph = getJsonGraph(grid)
 		data['graph'] = graph
 	return render(request,'grid/draw_grid.html',{'data':data})

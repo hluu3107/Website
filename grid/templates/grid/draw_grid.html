@@ -9,23 +9,15 @@
             <th scope="col">Velocity (mm/s)</th>
             <th scope="col">Concentration (mol/m^3)</th>
         </tr>
-    </thread>
-    <tbody>
+    </thread>        
+    <tbody id="tresult">
+        {% for conc,vel in data.resultList %}
         <tr>
-            <th scope="row">1</th>
-            <td id="v1">{{data.vList.0|floatformat:2 }}</td>
-            <td id="c1">{{data.cList.0|floatformat:2 }}</td>
+            <th scope="row"> {{ forloop.counter }}</th>
+            <td>{{ vel|floatformat:2 }}</td>
+            <td>{{ conc|floatformat:2}}</td>
         </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td id="v2">{{data.vList.1|floatformat:2 }}</td>
-            <td id="c2">{{data.cList.1|floatformat:2 }}</td>
-        </tr>
-        <tr>
-            <th scope="row">3</th>
-            <td id="v3">{{data.vList.2|floatformat:2 }}</td>
-            <td id="c3">{{data.cList.2|floatformat:2 }}</td>
-        </tr>
+        {% endfor %}
     </tbody>
 </table>
 </div>
@@ -61,9 +53,7 @@
             enableCamera: false
           }
         });
-        s.refresh();
-        console.log("{{data.vList}}}");
-        
+        s.refresh();        
         s.bind('clickEdge doubleClickEdge', function(e) {
             if(e.data.edge.mutable){
                 if(!e.data.edge.selected){
@@ -75,7 +65,7 @@
                 }
                     
             }
-            console.log(e.data.edge)
+            // console.log(e.data.edge)
             s.refresh();                    
         });
     
@@ -103,15 +93,17 @@
                     $("#vresult").text(""); 
                 }else{
                     $("#error-msg").text("");
-                    $("#v1").text(data.vList[0].toFixed(2));
-                    $("#v2").text(data.vList[1].toFixed(2));
-                    $("#v3").text(data.vList[2].toFixed(2));
-                    $("#c1").text(data.cList[0].toFixed(2));
-                    $("#c2").text(data.cList[1].toFixed(2));
-                    $("#c3").text(data.cList[2].toFixed(2));  
                     var g = data.graph;
                     s.graph = g;
-                    s.refresh();                                   
+                    s.refresh();
+                    console.log(data.resultList);
+                    var rdiv = $('#tresult');
+                    rdiv.html('');
+                    for (i=0;i<data.resultList.length;i++){
+                       rdiv.append('<tr><th scope="row">'+(i+1)+
+                        '</th><td>'+data.resultList[i][1].toFixed(2)+
+                        '</td><td>'+data.resultList[i][0].toFixed(2)+'</td></tr>');
+                    }
                 }                
             }
         });//end ajax request
