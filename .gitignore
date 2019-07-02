@@ -6,5 +6,4 @@ grid/templatetags/__pycache__/
 grid/migrations/
 
 .ebextension/
-requirements.txt
 db.sqlite3
