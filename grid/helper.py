@@ -65,6 +65,8 @@ def getResult(grid):
 	velocity_list = []
 	for i in range(grid.nNode-grid.nCol+1,grid.nNode+1):
 		if not grid.adjMatrix[i]:
+			concentration_list.append(0)
+			velocity_list.append(0)
 			continue
 		(u,v) = (i,grid.adjMatrix[i][0])
 		c = grid.concentration[i].calculateConcentration()
@@ -76,5 +78,7 @@ def getResult(grid):
 	# cString = ",".join(map(lambda x: "%.4f" % x,concentration_list))
 	# vString = ",".join(map(lambda x: "%.4f" % x,velocity_list))
 	return concentration_list,velocity_list
+
+
 
 

@@ -11,21 +11,9 @@ def createGrid(data):
 	nc = int(data.get('nc'))
 	#nNode = int(size * size + nIn + nOut)
 	#nEdge = reduceGrid(adjMatrix,nIn,nOut,nNode)
-	cstring = data.get('initC').split(",")
-	vstring = data.get('initV').split(",")
-	initC = {}
-	initV = {}
-	count = 1
-	for c in cstring:
-		if c=='x':
-			initC[count] = 0
-			initV[count] = 0
-		else:
-			initC[count] = float(c)
-			initV[count] = float(vstring[count-1])
-		count+=1
-	print(f'c: {initC}')
-	print(f'v: {initV}')	
+	initC,initV = processInputCV(data.get('initC'),data.get('initV'))	
+	#print(f'c: {initC}')
+	#print(f'v: {initV}')	
 	grid = Grid(nr,nc,nEdge,w,l,diffCoeff,adjMatrix,initV,initC)
 	return grid
 
@@ -151,6 +139,8 @@ def createEmptyGrid(data):
 	eclickcolor = "#e62739"
 	esize = 0.5
 	nNode = int((nr+2) * nc)
+	initC,initV = processInputCV(data.get('initC'),data.get('initV'))
+
 	# create nodes
 	for i in range(1,nNode+1):
 		node = {"id": str(i), "x": (i-1)%nc, "y":int((i-1)/nc), "size": nsize, "color":nColor}
@@ -172,6 +162,9 @@ def createEmptyGrid(data):
 	for snode in range(1,nc+1):
 		edge = {"id": str(snode)+"-"+str(snode+nc), "source": str(snode), "target": str(snode+nc), "size": esize, \
 			"mutable": True, "selected": False}
+		if initV[snode]>0:
+			edge["selected"] = True
+			edge["color"] = eclickcolor
 		edges.append(edge)
 	
 	graph = {"nodes": nodes, "edges": edges}
@@ -421,4 +414,18 @@ def bccHelper(node,parent,low,disc,st,adjMatrix,time):
 			low[node] = min(low[node],disc[v])
 			st.append((node,v))
 
-  
+def processInputCV(initCs,initVs):
+	cstring = initCs.split(",")
+	vstring = initVs.split(",")
+	initC = {}
+	initV = {}
+	count = 1
+	for c in cstring:
+		if c=='x':
+			initC[count] = 0
+			initV[count] = 0
+		else:
+			initC[count] = float(c)
+			initV[count] = float(vstring[count-1])
+		count+=1
+	return initC, initV

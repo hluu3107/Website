@@ -8,19 +8,29 @@
 <hr class="mt-0 mb-4">
 <form id="inputform" enctype="multipart/form-data" method="post" action="">
 	{% csrf_token %}
+	<div class = "row">
+		<div id="input_type" class="col-md-2 col-md-offset-5">
+			{{form.input_type|as_crispy_field}}
+		</div>
+	</div>
 	<div class="row">
 		<div class="col-md-2 col-md-offset-5">
+			{{form.input_file|as_crispy_field}}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-2 col-md-offset-4">
 			{{form.nr|as_crispy_field}}
 		</div>
-		<div class="col-md-2 col-md-offset-5">
+		<div class="col-md-2">
 			{{form.nc|as_crispy_field}}
 		</div>						
 	</div>
 	<div class="row">
-		<div class="col-md-2 col-md-offset-5">
+		<div class="col-md-2 col-md-offset-4">
 			{{form.initC|as_crispy_field}}
 		</div>
-		<div class="col-md-2 col-md-offset-5">
+		<div class="col-md-2">
 			{{form.initV|as_crispy_field}}
 		</div>					
 	</div>
@@ -33,21 +43,10 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-2 col-md-offset-4">
+		<div class="col-md-2 col-md-offset-5">
 			{{form.diffCoeff|as_crispy_field}}
 		</div>		
-	</div>
-	<div class = "row">
-		<div class="col-md-2 col-md-offset-5">
-			{{form.input_type|as_crispy_field}}
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-2 col-md-offset-5">
-			{{form.input_file|as_crispy_field}}
-		</div>
-	</div>
-	
+	</div>	
 	<button type="submit" class="btn">Submit</button>
 </form>
 <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>

@@ -36,54 +36,6 @@ def user_input(request):
 		form = BasicForm()
 	return render(request,'grid/basic_input.html',{'form': form})
 
-def result(request):
-	"""This is the result view with print out grid
-    """	
-	data = request.session.get('data')
-	grid = createGrid(data)		
-	solveGrid(grid)
-	cString,vString = getResult(grid)	
-	data['cString'] = cString
-	data['vString'] = vString
-	graph = getJsonGraph(grid)
-	data['graph'] = graph
-	# if request.session['draw']==True:
-	# 	del request.session['draw']	
-	return render(request,'grid/result.html',{'data':data})
-	# else:
-	# 	return redirect(user_input)
-
-@csrf_exempt
-def grid_input(request):
-	"""This is the graphical graph input view
-    """
-	if request.method == 'POST':
-		data = request.session.get('data')
-		postdata = request.POST.copy()
-		dt = data
-		dt['graph'] = postdata.get('graph')
-		#if ajax request	
-		if(postdata.get('status')=='1'):
-			#check if graph is connected. 					
-			isValid, adjMatrix, nEdge = verifyInputGraph(data)
-			if isValid==False:
-				#if not valid output error msg in the same page
-				return HttpResponse('0')
-			else:
-				#if ok simplify the grid, call result go to result page
-				data['adjMatrix'] = json.dumps(adjMatrix)
-				data['nEdge'] = str(nEdge)
-				request.session['data'] = data
-				request.session['draw'] = True
-				return HttpResponse('1')
-	if request.session['draw'] == True:
-		### Get size from session variable and render empty grid of given size
-		data = request.session.get('data')		
-		graph = createEmptyGrid(data)
-		### render empty grid		
-		return render(request,'grid/input.html',{'graph':graph})
-	return redirect(user_input)
-
 @csrf_exempt
 def draw(request):
 	"""This is the graphical graph input view
@@ -114,6 +66,10 @@ def draw(request):
 		### Get size from session variable and render empty grid of given size
 		data = request.session.get('data')		
 		graph = createEmptyGrid(data)
+		initC,initV = processInputCV(data.get('initC'),data.get('initV'))
+		print(initC)
+		data['initC'] = initC
+		data['initV'] = initV	
 		data['graph'] = graph
 		### render empty grid		
 		#return render(request,'grid/draw_grid.html',{'graph':graph})
@@ -124,7 +80,10 @@ def draw(request):
 		cString,vString = getResult(grid)
 		resultList = zip(cString,vString)
 		data['resultList'] = resultList
+		data['initC'] = grid.initC
+		data['initV'] = grid.initV
 		#print(f'c: {cString}), v: {vString}')		
 		graph = getJsonGraph(grid)
 		data['graph'] = graph
 	return render(request,'grid/draw_grid.html',{'data':data})
+
