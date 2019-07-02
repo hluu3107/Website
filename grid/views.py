@@ -7,11 +7,17 @@ from .process import *
 def user_input(request):
 	"""This is the input form for grid information
     """
+    #TODO error check
 	if request.method == 'POST':
     	# If request if POST get form info
 		form = BasicForm(request.POST, request.FILES)
 		if form.is_valid():
 			data = request.POST.copy()
+			init = [0] * int(data.get('nc'))
+			if not data.get('initV'):				
+				data['initV'] = ",".join(map(str,init))
+			if not data.get('initC'):
+				data['initC'] = ",".join(map(str,init))
 			if(data.get('input_type')=='1'):
 				#Upload text file
 				input_file = request.FILES.get('input_file')
@@ -20,7 +26,6 @@ def user_input(request):
 				data['nEdge'] = str(nEdge)
 				data['adjMatrix'] = json.dumps(adjMatrix)
 				request.session['data'] = data
-				#return redirect(result)
 				request.session['draw'] = False
 				return redirect(draw)
 			else:
@@ -29,7 +34,6 @@ def user_input(request):
 				request.session['draw'] = True
 				return redirect(draw)
 		else:
-			#TODO form error
 			print("Error form")
 	else:
 		# If request if GET print empty form
