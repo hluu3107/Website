@@ -12,10 +12,10 @@
         <div class="row">
             <div class= "title-input form-group col-xs-2">{{key}}</div>
             <div class="form-group col-xs-5">
-                <input type="number" class="form-control" step="0.01" min="0" value="{{data.initV|lookup:key}}">
+                <input type="number" class="form-control" step="0.01" min="0" value="{{data.initV|lookup:key}}" id="iv{{key}}">
             </div>
             <div class="form-group col-xs-5">
-                <input type="number" class="form-control" step="0.01" min="0"value="{{value}}">
+                <input type="number" class="form-control" step="0.01" min="0" value="{{value}}" id="ic{{key}}">
             </div>
         </div>
     {% endfor %}
@@ -92,7 +92,30 @@
         s.refresh();                    
     });
 $(document).on("click","#change-btn",function(){
-
+    var nc = "{{data.nc}}";
+    var ic = [];
+    var iv = [];
+    for(i=1;i<=nc;i++){
+        var namec = "#ic" + i.toString();
+        var namev = "#iv" + i.toString();
+        ic.push($(namec).val());
+        iv.push($(namev).val());
+    }
+    var sic = ic.join(",");
+    var siv = iv.join(",");
+    $.ajax({
+        url:'/draw',
+        type: 'POST',
+        data: {
+            status:2,
+            iv: siv,
+            ic: sic
+        },
+        dataType: 'json',
+        success: function (data){            
+           
+        }
+    });
 });
 $(document).on("click", "#run-btn",function(){
      var graph = {

@@ -49,7 +49,7 @@ def draw(request):
 		data = request.session.get('data')
 		postdata = request.POST.copy()
 		data['graph'] = postdata.get('graph')
-		if(postdata.get('status')=='1'):
+		if postdata.get('status')=='1':
 			#check if graph is connected. 					
 			isValid, adjMatrix, nEdge = verifyInputGraph(data)
 			if isValid==False:
@@ -66,12 +66,17 @@ def draw(request):
 				graph = getJsonGraph(grid)
 				data['graph'] = graph
 				return HttpResponse(json.dumps(data))
+		elif postdata.get('status')=='2':
+			#if change initC and V
+			data['initC'] = postdata.get('ic')
+			data['initV'] = postdata.get('iv')			
+			request.session['data'] = data
+			return HttpResponse('0')
 	elif request.session['draw'] == True:
 		### Get size from session variable and render empty grid of given size
 		data = request.session.get('data')		
 		graph = createEmptyGrid(data)
 		initC,initV = processInputCV(data.get('initC'),data.get('initV'))
-		print(initC)
 		data['initC'] = initC
 		data['initV'] = initV	
 		data['graph'] = graph
