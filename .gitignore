@@ -3,7 +3,7 @@ mysite/__pycache__/
 grid/templatetags/__pycache__/
 *.py[cod]
 
-grid/migration/
+grid/migrations/
 
 .ebextension/
 requirements.txt
