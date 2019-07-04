@@ -75,7 +75,7 @@ def draw(request):
 	elif request.session['draw'] == True:
 		### Get size from session variable and render empty grid of given size
 		data = request.session.get('data')		
-		graph = createEmptyGrid(data)
+		graph = json.dumps(createEmptyGrid(data))
 		initC,initV = processInputCV(data.get('initC'),data.get('initV'))
 		data['initC'] = initC
 		data['initV'] = initV	
@@ -84,15 +84,19 @@ def draw(request):
 		#return render(request,'grid/draw_grid.html',{'graph':graph})
 	elif request.session['draw']==False:
 		data = request.session.get('data')
-		grid = createGrid(data)		
-		solveGrid(grid)
-		cString,vString = getResult(grid)
-		resultList = zip(cString,vString)
-		data['resultList'] = resultList
-		data['initC'] = grid.initC
-		data['initV'] = grid.initV
-		#print(f'c: {cString}), v: {vString}')		
-		graph = getJsonGraph(grid)
+		graph = json.dumps(createGridFromFile(data))
+		# grid = createGrid(data)		
+		# solveGrid(grid)
+		# cString,vString = getResult(grid)
+		# resultList = zip(cString,vString)
+		# data['resultList'] = resultList
+		# data['initC'] = grid.initC
+		# data['initV'] = grid.initV
+		# #print(f'c: {cString}), v: {vString}')		
+		# graph = getJsonGraph(grid)
+		initC,initV = processInputCV(data.get('initC'),data.get('initV'))
+		data['initC'] = initC
+		data['initV'] = initV	
 		data['graph'] = graph
 	return render(request,'grid/draw_grid.html',{'data':data})
 

@@ -55,6 +55,7 @@ def getMatrixInput(data):
 	#print(adjMatrix)
 	return adjMatrix, len(edges)
 
+#produce fix graph
 def getJsonGraph(grid):
 	nodes = []
 	edges = []
@@ -83,52 +84,20 @@ def getJsonGraph(grid):
 	#print(jsong)
 	return jsong
 
-def getJsonGraph2(grid):
-	nodes = []
-	edges = []
-	nodenumber = 1
-	nsize = 2
-	nColor = "#e1e8f0"	
+def createGridFromFile(data):
+	nEdge,adjMatrix = getMatrixJson(data)
+	nr = int(data.get('nr'))
+	nc = int(data.get('nc'))
+	graph = createEmptyGrid(data)
 	eclickcolor = "#e62739"
-	esize = 0.5
-	size = grid.size
-	nIn = 2
-	nOut = 3
-	nNode = grid.nNode
-	# create input nodes
-	if(size>=7):
-		node1 = {"id": str(nIn-1), "x": 2, "y": 0, "size": nsize, "color":nColor}
-		node2 = {"id": str(nIn), "x": size-3, "y": 0, "size": nsize, "color":nColor}
-	else:
-		node1 = {"id": str(nIn-1), "x": 1, "y": 0, "size": nsize, "color":nColor}
-		node2 = {"id": str(nIn), "x": size-2, "y": 0, "size": nsize, "color":nColor}
-
-	# node1 = {"id": "1", "x": 2, "y": 0, "size": nsize, "color":nColor}
-	# node2 = {"id": "2", "x": grid.size-3, "y": 0, "size": nsize, "color":nColor}
-	nodes.extend([node1,node2])
-	# create normal nodes
-	for i in range(grid.nIn+1,grid.nNode-grid.nOut+1):
-		node = {"id": str(i), "x": (i-3)%grid.size, "y":int((i-3)/grid.size+1), "size": nsize, "color":nColor}
-		nodes.append(node)
-	#create output nodes
-	nodeo1 = {"id": str(grid.nNode-2), "x": 0, "y": grid.size+1, "size": nsize, "color":nColor}
-	nodeo2 = {"id": str(nNode-1), "x": int(size/2), "y": size+1, "size": nsize, "color":nColor}
-	#nodeo2 = {"id": str(grid.nNode-1), "x": int((grid.size+1)/2), "y": grid.size+1, "size": nsize, "color":nColor}
-	nodeo3 = {"id": str(grid.nNode), "x": grid.size-1, "y": grid.size+1, "size": nsize, "color":nColor}
-	nodes.extend([nodeo1,nodeo2,nodeo3])
+	for edge in graph["edges"]:
+		source = int(edge["source"])
+		target = int(edge["target"])
+		if source < target and source in adjMatrix[target]:
+			edge["selected"] = True
+			edge["color"] = eclickcolor
+	return graph
 	
-	#create edges
-	for snode,neighbors in grid.adjMatrix.items():
-		for enode in neighbors:
-			if snode < enode:
-				edge = {"id": str(snode)+"-"+str(enode), "source": str(snode), "target": str(enode), "size": esize, "selected": True \
-						,"color": eclickcolor,"mutable": False}				
-				edges.append(edge)
-	graph = {"nodes": nodes, "edges": edges}
-	jsong = json.dumps(graph)
-	#print(jsong)
-	return jsong
-
 def createEmptyGrid(data):
 	nr = int(data.get('nr'))
 	nc = int(data.get('nc'))
@@ -168,7 +137,7 @@ def createEmptyGrid(data):
 		edges.append(edge)
 	
 	graph = {"nodes": nodes, "edges": edges}
-	return json.dumps(graph)
+	return graph
 
 def verifyInputGraph(data):
 	adjMatrix, nEdge = getMatrixInput(data.get('graph'))
