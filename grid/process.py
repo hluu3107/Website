@@ -89,7 +89,7 @@ def createGridFromFile(data):
 	nr = int(data.get('nr'))
 	nc = int(data.get('nc'))
 	graph = createEmptyGrid(data)
-	eclickcolor = "#e62739"
+	eclickcolor = "#fbaf08"
 	for edge in graph["edges"]:
 		source = int(edge["source"])
 		target = int(edge["target"])
@@ -105,8 +105,8 @@ def createEmptyGrid(data):
 	edges = []
 	nsize = 2
 	nColor = "#e1e8f0"	
-	eclickcolor = "#e62739"
-	inColor = "#fbaf08"
+	eclickcolor = "#fbaf08"
+	inColor = "#00a0a0"
 	esize = 0.5
 	nNode = int((nr+2) * nc)
 	initC,initV = processInputCV(data.get('initC'),data.get('initV'))

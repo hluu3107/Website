@@ -54,7 +54,7 @@
 <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
 <script>
     var raw = "{{data.graph}}";
-    var eclickcolor = '#e62739';
+    var eclickcolor = '#fbaf08';
     var edefaultcolor = '#e1e8f0';
     var g = JSON.parse(raw.replace(/(&quot\;)/g,"\""));     
     s = new sigma({
@@ -69,7 +69,7 @@
         maxEdgeSize: 4,
         enableEdgeHovering: true,
         edgeHoverColor: 'default',
-        defaultEdgeHoverColor: '#9068be',
+        defaultEdgeHoverColor: '#ffdc6a',
         edgeHoverSizeRatio: 1,
         edgeHoverExtremities: true,
         defaultEdgeColor:'#6ed3cf',
