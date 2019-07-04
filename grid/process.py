@@ -97,7 +97,7 @@ def createGridFromFile(data):
 			edge["selected"] = True
 			edge["color"] = eclickcolor
 	return graph
-	
+
 def createEmptyGrid(data):
 	nr = int(data.get('nr'))
 	nc = int(data.get('nc'))
@@ -106,6 +106,7 @@ def createEmptyGrid(data):
 	nsize = 2
 	nColor = "#e1e8f0"	
 	eclickcolor = "#e62739"
+	inColor = "#fbaf08"
 	esize = 0.5
 	nNode = int((nr+2) * nc)
 	initC,initV = processInputCV(data.get('initC'),data.get('initV'))
@@ -113,24 +114,33 @@ def createEmptyGrid(data):
 	# create nodes
 	for i in range(1,nNode+1):
 		node = {"id": str(i), "x": (i-1)%nc, "y":int((i-1)/nc), "size": nsize, "color":nColor}
-		nodes.append(node)
+		# create labels for input
+		if i in range(1,nc+1):
+			node["label"] = "inlet " + str(i)
+			node["color"] = inColor
+		# create labels for ouput
+		if i in range(nNode-nc+1,nNode+1):
+			node["label"] = "outlet " + str(i-(nc*(nr+1)))
+			node["color"] = inColor
+		nodes.append(node)	
+
 	#create normal edges
 	for snode in range(nc+1,nNode-nc+1):
 		#create horizontal edges
 		if snode%nc!=0:
 			edge = {"id": str(snode)+"-"+str(snode+1), "source": str(snode), "target": str(snode+1), \
-			"size": esize, "selected": False, "mutable": True}
+			"size": esize, "selected": False, "mutable": True,"color": nColor}
 			edges.append(edge)
 		#create vertical edges
 		if int((snode-1)/nc) <= nr:
 			edge = {"id": str(snode)+"-"+str(snode+nc), "source": str(snode), "target": str(snode+nc), "size": esize, \
-			"mutable": True, "selected": False}
+			"mutable": True, "selected": False,"color": nColor}
 			edges.append(edge)	
 	
 	#create only vertical edges for input
 	for snode in range(1,nc+1):
 		edge = {"id": str(snode)+"-"+str(snode+nc), "source": str(snode), "target": str(snode+nc), "size": esize, \
-			"mutable": True, "selected": False}
+			"mutable": True, "selected": False, "color": nColor}
 		if initV[snode]>0:
 			edge["selected"] = True
 			edge["color"] = eclickcolor
