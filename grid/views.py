@@ -56,6 +56,8 @@ def draw(request):
 				#if not valid output error msg in the same page
 				return HttpResponse('0')
 			else:
+				data['initC'] = postdata.get('ic')
+				data['initV'] = postdata.get('iv')
 				data['adjMatrix'] = json.dumps(adjMatrix)
 				data['nEdge'] = str(nEdge)
 				grid = createGrid(data)		
@@ -65,13 +67,7 @@ def draw(request):
 				data['resultList'] = resultList
 				graph = getJsonGraph(grid)
 				data['graph'] = graph
-				return HttpResponse(json.dumps(data))
-		elif postdata.get('status')=='2':
-			#if change initC and V
-			data['initC'] = postdata.get('ic')
-			data['initV'] = postdata.get('iv')			
-			request.session['data'] = data
-			return HttpResponse('0')
+				return HttpResponse(json.dumps(data))		
 	elif request.session['draw'] == True:
 		### Get size from session variable and render empty grid of given size
 		data = request.session.get('data')		

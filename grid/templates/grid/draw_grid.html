@@ -20,15 +20,12 @@
         </div>
     {% endfor %}
     <div class="row btn-run">
-        <button class="btn" id="change-btn">Change</button>
-    </div>
-</div>
-<div class = "col-sm-8">
-	<div id='graph-container'></div>
-     <div class="row btn-run">   
         <button class="btn" id="run-btn">Run</button>
     </div>
-    <div id="error-msg"></div>   
+    <div id="error-msg"></div>
+</div>
+<div class = "col-sm-8">
+	<div id='graph-container'></div>     
 </div>
 <div class="col-sm-2">
     <table class="table result-table">
@@ -91,7 +88,12 @@
         // console.log(e.data.edge)
         s.refresh();                    
     });
-$(document).on("click","#change-btn",function(){
+
+$(document).on("click", "#run-btn",function(){
+     var graph = {
+        'nodes': s.graph.nodes(),
+        'edges': s.graph.edges()
+    }
     var nc = "{{data.nc}}";
     var ic = [];
     var iv = [];
@@ -104,31 +106,13 @@ $(document).on("click","#change-btn",function(){
     var sic = ic.join(",");
     var siv = iv.join(",");
     $.ajax({
-        url:'/draw',
-        type: 'POST',
-        data: {
-            status:2,
-            iv: siv,
-            ic: sic
-        },
-        dataType: 'json',
-        success: function (data){            
-           
-        }
-    });
-});
-$(document).on("click", "#run-btn",function(){
-     var graph = {
-        'nodes': s.graph.nodes(),
-        'edges': s.graph.edges()
-    }
-
-    $.ajax({
         url: '/draw',
         type: 'POST',
         data: {
             status: 1,
-            graph: JSON.stringify(graph)
+            graph: JSON.stringify(graph),
+            iv: siv,
+            ic: sic
         },
         dataType: 'json',
         success: function (data) {
