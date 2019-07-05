@@ -4,9 +4,9 @@
 {% block content %}
 <div class = "col-sm-2">
     <div class="row">
-        <div class= "title-input col-xs-2">#</div>
-        <div class="title-input col-xs-5">Velocity</div>
-        <div class="title-input col-xs-5">Concentration</div>
+        <div class= "title-input col-xs-2">Inlet #</div>
+        <div class="title-input col-xs-5">Inlet Velocity</div>
+        <div class="title-input col-xs-5">Inlet Concentration</div>
     </div>
     {% for key,value in data.initC.items %}
         <div class="row">
@@ -28,24 +28,20 @@
 	<div id='graph-container'></div>     
 </div>
 <div class="col-sm-2">
-    <table class="table result-table">
-        <thread>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Output Velocity (mm/s)</th>
-                <th scope="col">Output Concentration (mol/mm<sup>3</sup>)</th>
-            </tr>
-        </thread>        
-        <tbody id="tresult">
-            {% for conc,vel in data.resultList %}
-            <tr>
-                <th scope="row"> {{ forloop.counter }}</th>
-                <td>{{ vel|floatformat:2 }}</td>
-                <td>{{ conc|floatformat:2}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="row">
+        <div class= "title-input col-xs-2">Outlet #</div>
+        <div class="title-input col-xs-5">Outlet Velocity</div>
+        <div class="title-input col-xs-5">Outlet Concentration</div>
+    </div>   
+    <div class="row" id="tresult">
+        <div class= "title-input form-group col-xs-2">{{forloop.counter}}</div>
+        <div class="form-group col-xs-5">
+            {{ vel|floatformat:2 }}
+        </div>
+        <div class="form-group col-xs-5">
+            {{ conc|floatformat:2}}
+        </div>
+    </div>
 </div>
 <script type="text/javascript" src="{% static 'js/sigma.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
@@ -53,6 +49,8 @@
     var raw = "{{data.graph}}";
     var eclickcolor = '#fbaf08';
     var edefaultcolor = '#e1e8f0';
+    var defaultcolor = '#6ed3cf';
+    var ehoovercolor = '#ffdc6a';
     var g = JSON.parse(raw.replace(/(&quot\;)/g,"\""));     
     s = new sigma({
       graph: g,
@@ -66,11 +64,12 @@
         maxEdgeSize: 4,
         enableEdgeHovering: true,
         edgeHoverColor: 'default',
-        defaultEdgeHoverColor: '#ffdc6a',
+        defaultEdgeHoverColor: ehoovercolor,
         edgeHoverSizeRatio: 1,
         edgeHoverExtremities: true,
-        defaultEdgeColor:'#6ed3cf',
-        enableCamera: false
+        defaultEdgeColor:defaultcolor,
+        enableCamera: false,
+        defaultLabelColor:defaultcolor,
       }
     });
     s.refresh();        
@@ -130,9 +129,9 @@ $(document).on("click", "#run-btn",function(){
                 var rdiv = $('#tresult');
                 rdiv.html('');
                 for (i=0;i<data.resultList.length;i++){
-                   rdiv.append('<tr><th scope="row">'+(i+1)+
-                    '</th><td>'+data.resultList[i][1].toFixed(2)+
-                    '</td><td>'+data.resultList[i][0].toFixed(2)+'</td></tr>');
+                   rdiv.append('<div class= "title-input form-group col-xs-2">'+(i+1)+
+                    '</div><div class="form-group col-xs-5">'+data.resultList[i][1].toFixed(2)+
+                    ' </div><div class="form-group col-xs-5">'+data.resultList[i][0].toFixed(2)+'</div>');
                 }
             }                
         }   

@@ -8,10 +8,6 @@ class BasicForm(forms.Form):
 	GRID_CHOICES=[(1,'Upload Text File'),(2,'Draw Grid')]
 	nr = forms.IntegerField(label='Number of row:')
 	nc = forms.IntegerField(label='Number of col:')
-	initC = forms.CharField(required=False,label='Inlet Concentration:',help_text='enter inlet c separated by comma \
-		eg: x,x,1,0 for inlet at col 3 and 4 with value 1 and 0')
-	initV = forms.CharField(required=False,label='Inlet velocity (mm/s):',help_text='enter inlet v separated by comma \
-		eg: x,x,10,10 for inlet at col 3 and 4 with value 10 and 10')
 	w = forms.FloatField(label='Channel Width:',help_text='mm')
 	l = forms.FloatField(label='Channel Length:',help_text='mm')
 	diffCoeff = forms.FloatField(label='Diffusion Coefficient:',help_text='mm^2/s')

@@ -9,11 +9,13 @@ def createGrid(data):
 	diffCoeff = float(data.get('diffCoeff'))
 	nr = int(data.get('nr'))
 	nc = int(data.get('nc'))
-	#nNode = int(size * size + nIn + nOut)
-	#nEdge = reduceGrid(adjMatrix,nIn,nOut,nNode)
-	initC,initV = processInputCV(data.get('initC'),data.get('initV'))	
-	#print(f'c: {initC}')
-	#print(f'v: {initV}')	
+	initCl = data.get('initC').split(",")
+	initVl = data.get('initV').split(",")
+	initC = {}
+	initV = {}
+	for i in range(1,nc+1):
+		initC[i] = float(initCl[i-1])
+		initV[i] = float(initVl[i-1])
 	grid = Grid(nr,nc,nEdge,w,l,diffCoeff,adjMatrix,initV,initC)
 	return grid
 
@@ -109,18 +111,16 @@ def createEmptyGrid(data):
 	inColor = "#00a0a0"
 	esize = 0.5
 	nNode = int((nr+2) * nc)
-	initC,initV = processInputCV(data.get('initC'),data.get('initV'))
-
 	# create nodes
 	for i in range(1,nNode+1):
 		node = {"id": str(i), "x": (i-1)%nc, "y":int((i-1)/nc), "size": nsize, "color":nColor}
 		# create labels for input
 		if i in range(1,nc+1):
-			node["label"] = "inlet " + str(i)
+			node["label"] = "I" + str(i)
 			node["color"] = inColor
 		# create labels for ouput
 		if i in range(nNode-nc+1,nNode+1):
-			node["label"] = "outlet " + str(i-(nc*(nr+1)))
+			node["label"] = "O" + str(i-(nc*(nr+1)))
 			node["color"] = inColor
 		nodes.append(node)	
 
@@ -140,10 +140,7 @@ def createEmptyGrid(data):
 	#create only vertical edges for input
 	for snode in range(1,nc+1):
 		edge = {"id": str(snode)+"-"+str(snode+nc), "source": str(snode), "target": str(snode+nc), "size": esize, \
-			"mutable": True, "selected": False, "color": nColor}
-		if initV[snode]>0:
-			edge["selected"] = True
-			edge["color"] = eclickcolor
+			"mutable": True, "selected": False, "color": nColor}		
 		edges.append(edge)
 	
 	graph = {"nodes": nodes, "edges": edges}
@@ -393,18 +390,11 @@ def bccHelper(node,parent,low,disc,st,adjMatrix,time):
 			low[node] = min(low[node],disc[v])
 			st.append((node,v))
 
-def processInputCV(initCs,initVs):
-	cstring = initCs.split(",")
-	vstring = initVs.split(",")
+def processInputCV(data):
+	nc = int(data.get('nc'))
 	initC = {}
 	initV = {}
-	count = 1
-	for c in cstring:
-		if c=='x':
-			initC[count] = 0
-			initV[count] = 0
-		else:
-			initC[count] = float(c)
-			initV[count] = float(vstring[count-1])
-		count+=1
+	for i in range(1,nc+1):
+		initC[i] = 0
+		initV[i] = 0
 	return initC, initV
