@@ -48,6 +48,7 @@
     var edefaultcolor = '#e1e8f0';
     var defaultcolor = '#6ed3cf';
     var ehoovercolor = '#ffdc6a';
+
     var g = JSON.parse(raw.replace(/(&quot\;)/g,"\""));     
     s = new sigma({
       graph: g,
@@ -69,19 +70,45 @@
         defaultLabelColor:defaultcolor,
       }
     });
+
     s.refresh();        
     s.bind('clickEdge doubleClickEdge', function(e) {
         if(e.data.edge.mutable){
             if(!e.data.edge.selected){
                 e.data.edge.color = eclickcolor;
                 e.data.edge.selected = true;
+                s.graph.nodes(e.data.edge.source).color = eclickcolor;
+                s.graph.nodes(e.data.edge.target).color = eclickcolor;          
             }else{
                 e.data.edge.color = edefaultcolor;
                 e.data.edge.selected = false;
+                var source = s.graph.nodes(e.data.edge.source);
+                var target = s.graph.nodes(e.data.edge.target);
+                var sedges = s.graph.edges().filter(edge => edge["source"]===source.id || edge["target"]===source.id);                
+                var flag = false;
+
+                for(var i=0;i<sedges.length;i++){
+                    if(sedges[i].selected==true){
+                        flag = true;
+                        break;
+                    }    
+                }
+                if(flag==false)
+                    source.color = edefaultcolor;
+                var tedges = s.graph.edges().filter(edge => edge["source"]===target.id || edge["target"]===target.id);
+                flag = false;
+                 for(var i=0;i<tedges.length;i++){
+                    if(tedges[i].selected==true){
+                        flag = true;
+                        break;
+                    }    
+                }
+                if(flag==false)
+                    target.color = edefaultcolor;
             }
                 
         }
-        // console.log(e.data.edge)
+        // console.log(lookupNodesByKeyValue(s,'id',e.data.edge.source)[0].color);
         s.refresh();                    
     });
 
