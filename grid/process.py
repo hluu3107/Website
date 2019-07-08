@@ -117,11 +117,11 @@ def createEmptyGrid(data):
 		# create labels for input
 		if i in range(1,nc+1):
 			node["label"] = "I" + str(i)
-			node["color"] = inColor
+			#node["color"] = inColor
 		# create labels for ouput
 		if i in range(nNode-nc+1,nNode+1):
 			node["label"] = "O" + str(i-(nc*(nr+1)))
-			node["color"] = inColor
+			#node["color"] = inColor
 		nodes.append(node)	
 
 	#create normal edges
