@@ -127,3 +127,40 @@ h1 a, h2 a {
 .main{
   height:70%;
 }
+
+/*change color of placeholder in form*/
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+  color: #e1e8f0!important;
+  opacity: 0.5;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+  color: #e1e8f0!important;
+  opacity: 0.5;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color: #e1e8f0!important;
+   opacity: 0.5;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #e1e8f0!important;
+   opacity: 0.5;
+}
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: #e1e8f0!important;
+   opacity: 0.5;
+}
+
+::placeholder { /* Most modern browsers support this now. */
+   color: #e1e8f0!important;
+   opacity: 0.5;
+}
+
+/*hide spinner button in inputfields*/
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}

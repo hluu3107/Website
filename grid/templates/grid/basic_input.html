@@ -12,7 +12,7 @@
 			{{form.input_type|as_crispy_field}}
 		</div>
 	</div>
-	<div class="row justify-content-md-center">
+	<div class="row justify-content-md-center" id="input_file">
 		<div class="col-md-2 col-md-offset-5">
 			{{form.input_file|as_crispy_field}}
 		</div>
@@ -34,9 +34,16 @@
 		</div>
 	</div>
 	<div class="row justify-content-md-center">
-		<div class="col-md-2 col-md-offset-5">
+		<div class="col-md-2 col-md-offset-4">
 			{{form.diffCoeff|as_crispy_field}}
-		</div>		
+		</div>
+		<div class="col-md-2">
+			<p>Diffusion Coefficient example<br>
+			Sodium: 1.33e-4 <br>
+			Fluorescein: 4.25e-5<br>
+			Bovine Serum Albumin: 6.38e-6<br>			
+			</p>
+		</div>			
 	</div>	
 	<button type="submit" class="btn">Submit</button>
 </form>
@@ -44,10 +51,15 @@
 <script type="text/javascript">
 	// TODO: toggle hide/show when click on radio button
 	$(document).ready(function() {
-		// $('#input_type').on('change',function(){
-		// 	var val = $('input[name="input_type"]:checked').val();
-		// 	console.log(val)
-		// });
+		$('#input_file').hide();
+		$('#input_type').on('change',function(){
+			var val = $('input[name="input_type"]:checked').val();
+			if(val==1){
+				$('#input_file').show();
+			}else{
+				$('#input_file').hide();
+			}
+		});
 	});
 </script>
 </div>

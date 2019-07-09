@@ -29,6 +29,7 @@
 
     <div class="col-2" id="tresult">
         <div class="row align-items-center">
+            <div class = "title-input col-2"></div>
             <div class="title-input col-5">Outlet Velocity</div>
             <div class="title-input col-5">Outlet Concentration</div>
         </div>
@@ -152,13 +153,13 @@ $(document).on("click", "#run-btn",function(){
                 console.log(data.resultList);
                 var rdiv = $('#tresult');
                 rdiv.html('');
-                rdiv.append('<div class="row align-items-center"><div class="title-input col-5">Outlet Velocity</div><div class="title-input col-5">Outlet Concentration</div>');
+                rdiv.append('<div class="row align-items-center"><div class = "title-input col"></div><div class="title-input col-5">Outlet Velocity</div><div class="title-input col-5">Outlet Concentration</div>');
                 for (i=0;i<data.resultList.length;i++){
                     if(data.resultList[i][1]!=0){
-                        rdiv.append('<div class="row align-items-center justify-content-center"><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="'+data.resultList[i][1].toFixed(2)+
+                        rdiv.append('<div class="row align-items-center justify-content-center"><div class = "col"></div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="'+data.resultList[i][1].toFixed(2)+
                         '"></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value="'+data.resultList[i][0].toFixed(2)+'"></div></div>');
                     }else{
-                        rdiv.append('<div class="row align-items-center justify-content-center"><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value=""></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value=""></div></div>');
+                        rdiv.append('<div class="row align-items-center justify-content-center"><div class = "title-input col-2"></div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value=""></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value=""></div></div>');
                     }                  
                 }
             }                
