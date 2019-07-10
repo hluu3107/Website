@@ -9,6 +9,7 @@ def createGrid(data):
 	diffCoeff = float(data.get('diffCoeff'))
 	nr = int(data.get('nr'))
 	nc = int(data.get('nc'))
+	nEdge,adjMatrix = reduceGrid(adjMatrix,nr,nc)
 	initCl = data.get('initC').split(",")
 	initVl = data.get('initV').split(",")
 	initC = {}
@@ -98,6 +99,10 @@ def createGridFromFile(data):
 		if source < target and source in adjMatrix[target]:
 			edge["selected"] = True
 			edge["color"] = eclickcolor
+	for node in graph["nodes"]:
+		n = int(node["id"])
+		if adjMatrix[n]:
+			node["color"] = eclickcolor
 	return graph
 
 def createEmptyGrid(data):
@@ -183,104 +188,84 @@ def verifyInputGraph(data):
 	print(cc)
 	return False, adjMatrix, nEdge
 
-def reduceGrid2(adjMatrix,nIn,nOut,nNode):
+def reduceGrid(adjMatrix,nr,nc):
 	time = [0]
+	nNode = int((nr+2) * nc)
+	originalIn = []
+	for i in range(1,nc+1):
+		if adjMatrix[i]:
+			originalIn.append(i)
+	originalOut = []
+	for i in range(nNode-nc+1,nNode+1):
+		if adjMatrix[i]:
+			originalOut.append(i)
+
 	#connect inputs
-	for i in range(1,nIn):
+	for i in range(1,nc):
 		adjMatrix[i].append(i+1)
 		adjMatrix[i+1].append(i)
 	#connect outputs
-	for i in range(nNode-nOut+1,nNode):
+	for i in range(nNode-nc+1,nNode):
 		adjMatrix[i].append(i+1)
 		adjMatrix[i+1].append(i)
-	#TODO: check if connect input with output is nescessary?
 	#connect input and output
-	adjMatrix[1].append(nNode-nOut+1)
-	adjMatrix[nNode-nOut+1].append(i)
-	adjMatrix[2].append(nNode)
-	adjMatrix[nNode].append(2)
+	adjMatrix[1].append(nNode-nc+1)
+	adjMatrix[nNode-nc+1].append(1)
+	adjMatrix[nc].append(nNode)
+	adjMatrix[nNode].append(nc)
+	cc = getConnectedComponent(adjMatrix)
+	#print(cc)
+	#remove component not connect to input
+	for comp in cc:
+		if 1 not in comp:
+			for v in comp:
+				for n in adjMatrix[v]:
+					adjMatrix[n].remove(v)
+				adjMatrix[v] = []	
+	#find biconnected components
 	bc = findBiconnected(adjMatrix,time)
-	print(bc)
-
-def reduceGrid(adjMatrix,nIn,nOut,nNode):
+	#print(f'bi connected comp {bc}')
+	mc = []
+	for comp in bc:
+		if all(x in comp for x in list(range(1,nc+1))) and all(x in comp for x in  list(range(nNode-nc+1,nNode+1))):
+			mc = comp
+			break
+	#print(f'main comp {mc}')
 	time = [0]
-	# for node,neighbors in adjMatrix.items():
-	# 	print(f'node {node}: {neighbors}')
-	#connect inputs
-	for i in range(1,nIn):
-		adjMatrix[i].append(i+1)
-		adjMatrix[i+1].append(i)
-	#connect outputs
-	for i in range(nNode-nOut+1,nNode):
-		adjMatrix[i].append(i+1)
-		adjMatrix[i+1].append(i)
-	#TODO: check if connect input with output is nescessary?
-	#connect input and output
-	adjMatrix[1].append(nNode-nOut+1)
-	adjMatrix[nNode-nOut+1].append(i)
-	adjMatrix[2].append(nNode)
-	adjMatrix[nNode].append(2)
-
 	ap = findArticulationPoints(adjMatrix,time)
-	#print(ap)
-	#remove added edges:
-	for i in range(1,nIn):
-		adjMatrix[i].remove(i+1)
-		adjMatrix[i+1].remove(i)
-	for i in range(nNode-nOut+1,nNode):
-		adjMatrix[i].remove(i+1)
-		adjMatrix[i+1].remove(i)
-	adjMatrix[1].remove(nNode-nOut+1)
-	adjMatrix[nNode-nOut+1].remove(i)
-	adjMatrix[2].remove(nNode)
-	adjMatrix[nNode].remove(2)
-
-	q = queue.Queue()
-	s = {}
-	for v in adjMatrix.keys():
-		s[v] = 0
-	counter = 0
-	for n1 in ap:
-		visited = {}
-		for v in adjMatrix.keys():
-			visited[v] = False
-		q.queue.clear()
-		for i in range(1,nIn+1):
-			q.put(i)
-		for i in range(nNode-nOut+1,nNode+1):
-			q.put(i)
-		while q.empty()==False:
-			node = q.get()
-			for n2 in adjMatrix[node]:
-				if visited[n2]==False and s[n2]==counter:
-					visited[n2]=True
-					s[n2]+=1
-					if n2!=n1:
-						q.put(n2)
-		counter+=1
-	
-	newList = []
-	for v in adjMatrix.keys():
-		if s[v]==len(ap):
-			newList.append(v)
-	#print(f'new list is {newList}')
-	nEdge = 0
-	for v,neighbors in adjMatrix.items():
-		if v not in newList:
-			adjMatrix[v] = []
+	#print(f'articulation points {ap}')
+	mains = list(set(ap)&set(mc))
+	#print(f'removed points {mains}')
+	for comp in bc:
+		if comp==mc:
 			continue
-		removed = []
-		for n in neighbors:
-			if n not in newList:
-				removed.append(n)
-		newneighbors = [n for n in neighbors if n not in removed]
-		nEdge += len(newneighbors)
-		adjMatrix[v] = newneighbors
-	# for v,neighbors in grid.adjMatrix.items():
-	# 	print(f'{v}: {neighbors}')
-	#update number of edges
-	nEdge = int(nEdge/2)
-	return nEdge
+		for v in comp:
+			if v not in mains:
+				for u in adjMatrix[v]:
+					adjMatrix[u].remove(v)
+				adjMatrix[v]=[]
+	#remove added edges
+	adjMatrix[1].remove(nNode-nc+1)
+	adjMatrix[nNode-nc+1].remove(1)
+	adjMatrix[nc].remove(nNode)
+	adjMatrix[nNode].remove(nc)
+
+	for i in range(1,nc+1):
+		if i not in originalIn:
+			adjMatrix[i] = []
+		else:
+			adjMatrix[i] = [i+nc]
+	for i in range(nNode-nc+1,nNode+1):
+		if i not in originalOut:
+			adjMatrix[i] = []
+		else:
+			adjMatrix[i] = [i-nc]
+	#print(adjMatrix)
+	#count edges again
+	nEdges = 0
+	for v,neighbors in adjMatrix.items():
+		nEdges+=len(neighbors)
+	return int(nEdges/2),adjMatrix
 
 # code taken from https://www.geeksforgeeks.org/connected-components-in-an-undirected-graph/
 def getConnectedComponent(adjMatrix):
@@ -364,12 +349,23 @@ def findBiconnected(adjMatrix,time):
 		low[key] = -1
 	for key in adjMatrix.keys():
 		if disc[key]==-1:
-			bccHelper(key,parent,low,disc,st,adjMatrix,time)
-		while st:
-			bc.append(st.pop())
-	return bc
+			bccHelper(key,parent,low,disc,st,adjMatrix,time,bc)
+		if st:
+			comp = []
+			while st:
+				w = st.pop()
+				comp.append(w)
+			bc.append(comp)
+	bcv = []
+	for list in bc:
+		vset = set()
+		for (u,v) in list:
+			vset.add(u)
+			vset.add(v)
+		bcv.append(vset)	
+	return bcv
 
-def bccHelper(node,parent,low,disc,st,adjMatrix,time):
+def bccHelper(node,parent,low,disc,st,adjMatrix,time,bc):
 	children = 0
 	disc[node] = time[0]
 	low[node] = time[0]
@@ -379,13 +375,16 @@ def bccHelper(node,parent,low,disc,st,adjMatrix,time):
 			parent[v] = node
 			children+=1
 			st.append((node,v))
-			bccHelper(v,parent,low,disc,st,adjMatrix,time)
+			bccHelper(v,parent,low,disc,st,adjMatrix,time,bc)
 
 			low[node] = min(low[node],low[v])
 			if parent[node]==-1 and children > 1 or parent[node]!= -1 and low[v] >= disc[node]:
 				w = -1
+				comp = []
 				while w!=(node,v):
 					w = st.pop()
+					comp.append(w)
+				bc.append(comp)
 		elif v!=parent[node] and low[node] > low[v]:
 			low[node] = min(low[node],disc[v])
 			st.append((node,v))

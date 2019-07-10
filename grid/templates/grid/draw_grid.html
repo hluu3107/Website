@@ -50,7 +50,7 @@
     var defaultcolor = '#6ed3cf';
     var ehoovercolor = '#ffdc6a';
 
-    var g = JSON.parse(raw.replace(/(&quot\;)/g,"\""));     
+    var g = JSON.parse(raw.replace(/(&quot\;)/g,"\""));
     s = new sigma({
       graph: g,
       renderer: {
@@ -143,14 +143,19 @@ $(document).on("click", "#run-btn",function(){
             // var msg = $(".side-nav-right").text();
             if (data=='0'){
                 $("#error-msg").text("Grid has no input and/or output or it is not connected");
-                $("#cresult").text("");
-                $("#vresult").text(""); 
             }else{
                 $("#error-msg").text("");
-                var g = data.graph;
-                s.graph = g;
+                var g = JSON.parse(data.graph.replace(/(&quot\;)/g,"\""));
+                for (var i=0;i<g.nodes.length;i++){
+                    var id = g.nodes[i]["id"];
+                    s.graph.nodes(id).color = g.nodes[i]["color"];
+                }
+                for (var i=0;i<g.edges.length;i++){
+                    var id = g.edges[i]["id"];
+                    s.graph.edges(id).color = g.edges[i]["color"];
+                     s.graph.edges(id).selected = g.edges[i]["selected"];
+                }
                 s.refresh();
-                console.log(data.resultList);
                 var rdiv = $('#tresult');
                 rdiv.html('');
                 rdiv.append('<div class="row align-items-center"><div class = "title-input col"></div><div class="title-input col-5">Outlet Velocity</div><div class="title-input col-5">Outlet Concentration</div>');

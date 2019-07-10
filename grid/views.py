@@ -17,7 +17,8 @@ def user_input(request):
 				#Upload text file
 				input_file = request.FILES.get('input_file')
 				#TODO Verify input file
-				nEdge,adjMatrix = process_input(input_file,int(data.get('nr')),int(data.get('nc')))			
+				nEdge,adjMatrix = process_input(input_file,int(data.get('nr')),int(data.get('nc')))
+				nEdge,adjMatrix = reduceGrid(adjMatrix,int(data.get('nr')),int(data.get('nc')))			
 				data['nEdge'] = str(nEdge)
 				data['adjMatrix'] = json.dumps(adjMatrix)
 				request.session['data'] = data
@@ -55,12 +56,14 @@ def draw(request):
 				data['initV'] = postdata.get('iv')
 				data['adjMatrix'] = json.dumps(adjMatrix)
 				data['nEdge'] = str(nEdge)
-				grid = createGrid(data)		
+				grid = createGrid(data)
+				data['adjMatrix'] = json.dumps(grid.adjMatrix)
+				data['nEdge'] = grid.nEdge			
+				graph = json.dumps(createGridFromFile(data))				
 				solveGrid(grid)
 				cString,vString = getResult(grid)
 				resultList = list(zip(cString,vString))
 				data['resultList'] = resultList
-				graph = getJsonGraph(grid)
 				data['graph'] = graph
 				return HttpResponse(json.dumps(data))
 	data = request.session.get('data')		

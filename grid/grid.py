@@ -8,8 +8,6 @@ class Grid:
 	def __init__(self,nr,nc,nEdge,w,l,diffCoeff,matrix,initV,initC):
 		self.nRow = nr
 		self.nCol = nc
-		#self.nIn = nin
-		#self.nOut = nout
 		self.nNode = int((nr+2) * nc)
 		self.nEdge = int(nEdge)
 		self.w = w
