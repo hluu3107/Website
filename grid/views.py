@@ -17,10 +17,12 @@ def user_input(request):
 				#Upload text file
 				input_file = request.FILES.get('input_file')
 				#TODO Verify input file
-				nEdge,adjMatrix = process_input(input_file,int(data.get('nr')),int(data.get('nc')))
-				nEdge,adjMatrix = reduceGrid(adjMatrix,int(data.get('nr')),int(data.get('nc')))			
+				nEdge,adjMatrix,nr,nc = process_input(input_file)
+				nEdge,adjMatrix = reduceGrid(adjMatrix,nr,nc)			
 				data['nEdge'] = str(nEdge)
 				data['adjMatrix'] = json.dumps(adjMatrix)
+				data['nr'] = str(nr)
+				data['nc'] = str(nc)
 				request.session['data'] = data
 				request.session['draw'] = False
 				return redirect(draw)

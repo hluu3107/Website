@@ -1,21 +1,23 @@
 import numpy as np
 from collections import defaultdict
 
-def process_input(inputFile,nr,nc):
+def process_input(inputFile):
 	#process input file and return adjacency matrix	
 	f = ''
 	adj_matrix = {}
 	count = 0
 	order = []
+	for line in inputFile:
+		f = f + line.decode()
+	f = f.splitlines()
+	nr = int(f[0])
+	nc = int(f[1])
 	for i in range(-1,-nc-1,-1):
 		order.append(i)
 	for i in range(nc,0,-1):
 		order.append(i)
-
-	for line in inputFile:
-		f = f + line.decode()
-
-	for line in f.splitlines():		
+	for i in range(2,len(f)):
+		line = f[i]
 		st = line.split(":")
 		node1 = int(st[0])		
 		st2 = st[1].strip().split(",")
@@ -25,7 +27,7 @@ def process_input(inputFile,nr,nc):
 			neighbors.sort(key=lambda x:order.index(x-node1))						
 			adj_matrix[node1] = neighbors
 		count += len(adj_matrix[node1])
-	return int(count/2),adj_matrix
+	return int(count/2),adj_matrix,nr,nc
 
 def list_diff(list1,list2):
 	return [item for item in list1 if item not in list2]

@@ -21,7 +21,7 @@
 		<div id = "nr" class="col-md-2 col-md-offset-4">
 			{{form.nr|as_crispy_field}}
 		</div>
-		<div class="col-md-2">
+		<div id = "nc" class="col-md-2">
 			{{form.nc|as_crispy_field}}
 		</div>						
 	</div>	
@@ -52,13 +52,26 @@
 <script type="text/javascript">
 	// TODO: toggle hide/show when click on radio button
 	$(document).ready(function() {
-		$('#input_file').hide();
+		var itype = $('input[name="input_type"]:checked').val();
+		if(itype==1){
+			$('#input_file').show();
+			$('#nr').hide();
+			$('#nc').hide();
+		}else{
+			$('#input_file').hide();
+			$('#nr').show();
+			$('#nc').show();
+		}		
 		$('#input_type').on('change',function(){
 			var val = $('input[name="input_type"]:checked').val();
 			if(val==1){
 				$('#input_file').show();
+				$('#nr').hide();
+				$('#nc').hide();
 			}else{
 				$('#input_file').hide();
+				$('#nr').show();
+				$('#nc').show();
 			}
 		});
 		$('#inputform').validate({
@@ -67,7 +80,17 @@
 					required: function(e){
 						return $('input[name="input_type"]:checked').val()==1;
 					}
-				}
+				},
+				nr: {
+					required: function(e){
+						return $('input[name="input_type"]:checked').val()==2;
+					}
+				},
+				nc: {
+					required: function(e){
+						return $('input[name="input_type"]:checked').val()==2;
+					}
+				},
 			}			
 		});
 	});
