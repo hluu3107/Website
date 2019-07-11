@@ -2,7 +2,7 @@ from .grid import *
 import json
 import queue
 import math
-def createGrid(data):
+def createGrid(data,initC,initV):
 	nEdge,adjMatrix = getMatrixJson(data)
 	w = float(data.get('w'))
 	l = float(data.get('l'))
@@ -10,13 +10,6 @@ def createGrid(data):
 	nr = int(data.get('nr'))
 	nc = int(data.get('nc'))
 	nEdge,adjMatrix = reduceGrid(adjMatrix,nr,nc)
-	initCl = data.get('initC').split(",")
-	initVl = data.get('initV').split(",")
-	initC = {}
-	initV = {}
-	for i in range(1,nc+1):
-		initC[i] = float(initCl[i-1])
-		initV[i] = float(initVl[i-1])
 	grid = Grid(nr,nc,nEdge,w,l,diffCoeff,adjMatrix,initV,initC)
 	return grid
 
@@ -397,3 +390,24 @@ def processInputCV(data):
 		initC[i] = 0
 		initV[i] = 0
 	return initC, initV
+
+def validateInlet(data):
+	initCl = data.get('initC').split(",")
+	initVl = data.get('initV').split(",")
+	nc = int(data.get('nc'))
+	initC = {}
+	initV = {}
+	start = 0
+	found = False
+	for i in range(1,nc+1):
+		initC[i] = float(initCl[i-1])
+		initV[i] = float(initVl[i-1])
+		if not found and initV[i] > 0:
+			start = i
+			found = True
+	isValid = True
+	for i in range(start,nc-1):
+		if initC[i] < initC[i+1]:
+			isValid = False
+			break
+	return isValid, initC, initV

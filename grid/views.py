@@ -29,8 +29,8 @@ def user_input(request):
 				request.session['data'] = data
 				request.session['draw'] = True
 				return redirect(draw)
-		else:
-			print("Error form")
+		# else:
+		# 	print("Error form")
 	else:
 		# If request if GET print empty form
 		form = BasicForm()
@@ -47,16 +47,19 @@ def draw(request):
 		data['graph'] = postdata.get('graph')
 		if postdata.get('status')=='1':
 			#check if graph is connected. 					
-			isValid, adjMatrix, nEdge = verifyInputGraph(data)
+			isValid, adjMatrix, nEdge = verifyInputGraph(data)			
 			if isValid==False:
 				#if not valid output error msg in the same page
 				return HttpResponse('0')
 			else:
 				data['initC'] = postdata.get('ic')
 				data['initV'] = postdata.get('iv')
+				isInletValid, initC, initV = validateInlet(data)	
+				if isInletValid==False:
+					return HttpResponse('1')
 				data['adjMatrix'] = json.dumps(adjMatrix)
-				data['nEdge'] = str(nEdge)
-				grid = createGrid(data)
+				data['nEdge'] = str(nEdge)				
+				grid = createGrid(data,initC,initV)
 				data['adjMatrix'] = json.dumps(grid.adjMatrix)
 				data['nEdge'] = grid.nEdge			
 				graph = json.dumps(createGridFromFile(data))				
