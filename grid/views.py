@@ -9,7 +9,7 @@ def user_input(request):
     """
     #TODO error check
 	if request.method == 'POST':
-    	# If request if POST get form info
+    	# If request is POST get form info
 		form = BasicForm(request.POST, request.FILES)
 		if form.is_valid():
 			data = request.POST.copy()

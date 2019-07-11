@@ -23,7 +23,6 @@ class BasicForm(forms.Form):
 		self.helper = FormHelper()
 		self.helper.layout = Layout(Div(InlineRadios('input_type')))
 
-
 class InletSetup(forms.Form):
 	inC = forms.FloatField(label='Inlet Concentration:')
 	inV = forms.FloatField(label='Inlet Velocity:')
