@@ -71,7 +71,8 @@ def draw(request):
 				data['resultList'] = resultList
 				data['graph'] = graph
 				return HttpResponse(json.dumps(data))
-	data = request.session.get('data')		
+	data = request.session.get('data')
+	data["draw"] = request.session['draw']
 	if request.session['draw'] == True:	
 		graph = json.dumps(createEmptyGrid(data))
 	elif request.session['draw']==False:

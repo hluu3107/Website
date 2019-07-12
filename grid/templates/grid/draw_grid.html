@@ -3,14 +3,19 @@
 {% load app_filters %}
 {% block content %}
 <div class="row main">
-    <div class = "col-2">
+    <div class = "col-xs-12 col-sm-6 col-md-6 col-lg-3 col-xl-2">
+        <div class="row align-items-center">
+            <div class= "title-input col-2">Inlet</div>
+            <div class="title-input col-5">Velocity</div>
+            <div class="title-input col-5">Concentration</div>
+        </div>
         <div class="row align-items-center">
             <div class= "title-input col-2">#</div>
-            <div class="title-input col-5">Inlet Velocity</div>
-            <div class="title-input col-5">Inlet Concentration</div>
+            <div class="title-input col-5">(1-100 mm/s)</div>
+            <div class="title-input col-5">(0-1)</div>
         </div>
         {% for key,value in data.initC.items %}
-            <div class="row align-items-center">
+            <div class="row align-items-center" id="in{{key}}">
                 <div class= "title-input col-2">{{key}}</div>
                 <div class="form-group col-5">
                     <input type="number" class="form-control" step="0.01" min="0" value="{{data.initV|lookup:key}}" id="iv{{key}}">
@@ -27,16 +32,21 @@
         <div id="error-msg"></div>
     </div>
 
-    <div class="col-2" id="tresult">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 col-xl-2">
         <div class="row align-items-center">
-            <div class = "title-input col-2"></div>
-            <div class="title-input col-5">Outlet Velocity</div>
-            <div class="title-input col-5">Outlet Concentration</div>
+            <div class = "title-input col-2">Outlet</div>
+            <div class="title-input col-5">Velocity</div>
+            <div class="title-input col-5">Concentration</div>
         </div>
-        <div class="row" id="tresult"></div>        
+         <div class="row align-items-center">
+            <div class= "title-input col-2">#</div>
+            <div class="title-input col-5">(mm/s)</div>
+            <div class="title-input col-5"></div>
+        </div>
+        <div id="tresult"></div>        
     </div>
 
-    <div class = "col-8 no-float">
+    <div class = "col-lg-6 col-xl-8">
         <div id='graph-container'></div>     
     </div>    
 </div>
@@ -49,8 +59,8 @@
     var edefaultcolor = '#e1e8f0';
     var defaultcolor = '#6ed3cf';
     var ehoovercolor = '#ffdc6a';
-
-    var g = JSON.parse(raw.replace(/(&quot\;)/g,"\""));
+    var nc = "{{data.nc}}";
+    var g = JSON.parse(raw.replace(/(&quot\;)/g,"\""));    
     s = new sigma({
       graph: g,
       renderer: {
@@ -79,7 +89,14 @@
                 e.data.edge.color = eclickcolor;
                 e.data.edge.selected = true;
                 s.graph.nodes(e.data.edge.source).color = eclickcolor;
-                s.graph.nodes(e.data.edge.target).color = eclickcolor;          
+                s.graph.nodes(e.data.edge.target).color = eclickcolor;   
+                // check if source is input to mark inlet
+                var source = e.data.edge.source;
+                if (parseInt(source)<=nc){
+                    var inid = "in"+source;
+                    var elem = document.getElementById(inid);
+                    elem.style.color = eclickcolor;
+                }      
             }else{
                 e.data.edge.color = edefaultcolor;
                 e.data.edge.selected = false;
@@ -87,7 +104,11 @@
                 var target = s.graph.nodes(e.data.edge.target);
                 var sedges = s.graph.edges().filter(edge => edge["source"]===source.id || edge["target"]===source.id);                
                 var flag = false;
-
+                if (parseInt( e.data.edge.source)<=nc){
+                    var inid = "in"+ e.data.edge.source;
+                    var elem = document.getElementById(inid);
+                    elem.style.color ="black";
+                }      
                 for(var i=0;i<sedges.length;i++){
                     if(sedges[i].selected==true){
                         flag = true;
@@ -112,7 +133,21 @@
         // console.log(lookupNodesByKeyValue(s,'id',e.data.edge.source)[0].color);
         s.refresh();                    
     });
+$(document).ready(function() {
+    if("{{data.draw}}"=="False"){
+        var adjMatrix = JSON.parse("{{data.adjMatrix}}".replace(/(&quot\;)/g,"\""));        
+        for(var i=1;i<=nc;i++){
+            var stri = i.toString();
+            if(adjMatrix[stri].length!=0){
+                $("#in"+stri).css('color', eclickcolor);
+            }     
+        }
+    }
+   
+    // for(int i=0;i<nc;i++){
 
+    // }
+});
 $(document).on("click", "#run-btn",function(){
      var graph = {
         'nodes': s.graph.nodes(),
@@ -159,14 +194,13 @@ $(document).on("click", "#run-btn",function(){
                 }
                 s.refresh();
                 var rdiv = $('#tresult');
-                rdiv.html('');
-                rdiv.append('<div class="row align-items-center"><div class = "title-input col"></div><div class="title-input col-5">Outlet Velocity</div><div class="title-input col-5">Outlet Concentration</div>');
+                rdiv.html('');                
                 for (i=0;i<data.resultList.length;i++){
-                    if(data.resultList[i][1]!=0){
-                        rdiv.append('<div class="row align-items-center justify-content-center"><div class = "col"></div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="'+data.resultList[i][1].toFixed(2)+
+                    if(data.resultList[i][1]!=0){                       
+                        rdiv.append('<div class="row align-items-center justify-content-center"><div class = "title-input col-2" style="color:#fbaf08";>'+(i+1)+'</div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="'+data.resultList[i][1].toFixed(2)+
                         '"></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value="'+data.resultList[i][0].toFixed(2)+'"></div></div>');
                     }else{
-                        rdiv.append('<div class="row align-items-center justify-content-center"><div class = "title-input col-2"></div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value=""></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value=""></div></div>');
+                          rdiv.append('<div class="row align-items-center justify-content-center"><div class = "title-input col-2">'+(i+1)+'</div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value=""></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value=""></div></div>');
                     }                  
                 }
             }                
