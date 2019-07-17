@@ -86,3 +86,8 @@ def draw(request):
 	data['initV'] = initV	
 	return render(request,'grid/draw_grid.html',{'data':data})
 
+def tutorial(request):
+	return render(request,'grid/tutorial.html')
+
+def contact(request):
+	return render(request,'grid/contact.html')

@@ -1,5 +1,56 @@
 {% extends 'grid/base.html' %}
 {% load static %}
 {% block content %}
+<h2>Tutorial</h2>
+<hr class="mt-0 mb-4">
+<h4>Step 1: Provide parameters</h4>
+<img src="{% static "image/step1.png" %}" height="250"/>
+<div class="row tut-container text-left justify-content-md-center">
+	<div class="col-8 offset-2">
+		<ul>
+			<li>Choose to draw grid or upload text file for grid geometry (the uploaded file need to be in correct format for the parser to work correctly)</li>
+			<li>If the draw option is choosen: input number of rows (R), columns (C), channel width (w) and length (l) of grid</li>
+			<li>If the grid geometry is provided from file, you do not need to specify number of rows and columns of grid</li>
+			<li>Input diffusion coefficient of your chemicals</li>
+			<li>Click submit</li>
+		</ul>
+	</div>
+</div>
+<h4>Step 2: Provide grid geometry and inlet parameters</h4>
+<div class="row justify-content-md-center">
+	<div class="col-3 offset-1">
+		<img class = "pic-tut" src="{% static "image/step2_2.png" %}"width="200"/>
+	</div>
+	<div class="col-3">
+		<img class = "pic-tut" src="{% static "image/step2_1.png" %}" width="200"/>
+	</div>
+</div>
 
+<div class="row tut-container text-left justify-content-md-center">
+	<div class="col-8 offset-2">
+		<ul>
+			<li>The right canvas shows an initially empty (R+2)xC grid with the top row is reserved for input and the last row for output</li>
+			<li>You can click on any channel to select/unselect that channel. Note that there need to be at least one inlet, one outlet and the grid has to be connected</li>
+			<li>After you are done drawing the grid, input inlets' velocity and concentration on the left side. The inlet number for the inlets you chose in the previous step are colored orange. Velocity unit is mm/s and should not exceed 100mm/s to guarantee the flow is still laminar. The concentration is normalized concentration with value from 0-1. Note that for choosn inlets, their concentration need to be non-increasing from left to right.</li>
+			<li>Click Run</li>			
+		</ul>
+	</div>
+</div>
+<h4>Step 3: Modify geometry and inlet parameters for desired result</h4>
+<div class="row justify-content-md-center">
+	<div class="col-3 offset-1">
+		<img class = "pic-tut" src="{% static "image/step2_4.png" %}"width="200"/>
+	</div>
+	<div class="col-3">
+		<img class = "pic-tut" src="{% static "image/step2_3.png" %}" width="200"/>
+	</div>
+</div>
+<div class="row tut-container text-left justify-content-md-center">
+	<div class="col-8 offset-2">
+		<ul>
+			<li>If there is an error message, fix inlet parameters and/or grid geometry then click run again. Otherwise, the result is shown on the left pannel. Also note that unnecessary channels are removed.</li>
+			<li>You can continue to modify the grid and inlet parameters and run again to get new result</li>
+		</ul>
+	</div>
+</div>
 {% endblock %}

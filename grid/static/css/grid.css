@@ -165,3 +165,12 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+.tut-container{
+    padding-top:20px;
+}
+
+.pic-tut{
+  display: block;
+  margin:auto;
+}
