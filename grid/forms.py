@@ -18,7 +18,7 @@ class BasicForm(forms.Form):
 	
 	### Render inline radio
 	def __init__(self, *args, **kwargs):
-		super(BasicForm, self).__init__(*args, **kwargs)
+		super(forms.Form, self).__init__(*args, **kwargs)
 		self.initial['input_type'] = 2
 		self.helper = FormHelper()
 		self.helper.layout = Layout(Div(InlineRadios('input_type')))
