@@ -38,19 +38,20 @@
             <div class= "title-input col-2">#</div>
             <div class="title-input col-5">(mm/s)</div>
             <div class="title-input col-5"></div>
-        </div>
-            {% for key,value in data.initC.items %}
+        </div>     
+        <div id="tresult">
+        {% for key,value in data.initC.items %}
             <div class="row align-items-center" id="out{{key}}">
-            <div class= "title-input disable-num col-2" style="color:#e1e8f0">{{key}}</div>
-            <div class="form-group col-5">
-                <input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
+                <div class= "title-input disable-num col-2">{{key}}</div>
+                <div class="form-group col-5">
+                    <input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
+                </div>
+                <div class="form-group col-5">
+                    <input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
+                </div>
             </div>
-            <div class="form-group col-5">
-                <input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
-            </div>
-        </div>
-        {% endfor %}       
-        <div id="tresult"></div>          
+        {% endfor %}  
+        </div>          
     </div>
    
     <div class = "col-sm-6 col-md-6 col-lg-8 col-xl-9">
@@ -66,7 +67,8 @@
     var edefaultcolor = '#e1e8f0';
     var defaultcolor = '#6ed3cf';
     var ehoovercolor = '#ffdc6a';
-    var nc = "{{data.nc}}";
+    var nc = parseInt("{{data.nc}}");
+    var nr = parseInt("{{data.nr}}");
     var g = JSON.parse(raw.replace(/(&quot\;)/g,"\""));    
     s = new sigma({
       graph: g,
@@ -99,9 +101,17 @@
                 s.graph.nodes(e.data.edge.target).color = eclickcolor;   
                 // check if source is input to mark inlet
                 var source = e.data.edge.source;
+                var target = e.data.edge.target;
                 if (parseInt(source)<=nc){
                     var inid = "in"+source;
                     var elem = document.getElementById(inid);
+                    elem.style.color = eclickcolor;
+                }else if(parseInt(target)>(nr+1)*nc){
+                    if(target%nc==0)
+                        var outid = "out"+nc;
+                    else
+                        var outid = "out"+(target%nc);
+                    var elem = document.getElementById(outid);
                     elem.style.color = eclickcolor;
                 }      
             }else{
@@ -115,7 +125,14 @@
                     var inid = "in"+ e.data.edge.source;
                     var elem = document.getElementById(inid);
                     elem.style.color = edefaultcolor;
-                }      
+                }else if(parseInt(e.data.edge.target)>(nr+1)*nc){
+                    if(parseInt(e.data.edge.target)%nc==0)
+                        var outid = "out"+nc;
+                    else
+                        var outid = "out"+(parseInt(e.data.edge.target)%nc);
+                    var elem = document.getElementById(outid);
+                    elem.style.color = edefaultcolor;
+                }          
                 for(var i=0;i<sedges.length;i++){
                     if(sedges[i].selected==true){
                         flag = true;
@@ -149,12 +166,20 @@ $(document).ready(function() {
                 $("#in"+stri).css('color', eclickcolor);
             }else{
                 $("#in"+stri).css('color', edefaultcolor);
-            }     
+            }
+            var outi = (i+(nr+1)*nc).toString();
+            if(adjMatrix[outi].length!=0){
+                $("#out"+stri).css('color', eclickcolor);
+            }else{
+                $("#out"+stri).css('color', edefaultcolor);
+            }
         }
+
     }else{
         for(var i=1;i<=nc;i++){
             var stri = i.toString();
-            $("#in"+stri).css('color', edefaultcolor);                 
+            $("#in"+stri).css('color', edefaultcolor); 
+            $("#out"+stri).css('color', edefaultcolor);                  
         }
     }
    
