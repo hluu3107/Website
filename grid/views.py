@@ -57,8 +57,10 @@ def draw(request):
 				data['initC'] = postdata.get('ic')
 				data['initV'] = postdata.get('iv')
 				isInletValid, initC, initV = validateInlet(data)	
-				if isInletValid==False:
+				if isInletValid==1:
 					return HttpResponse('1')
+				if isInletValid==2:
+					return HttpResponse('2')
 				data['adjMatrix'] = json.dumps(adjMatrix)
 				data['nEdge'] = str(nEdge)				
 				grid = createGrid(data,initC,initV)

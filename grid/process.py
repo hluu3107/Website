@@ -396,18 +396,26 @@ def validateInlet(data):
 	initVl = data.get('initV').split(",")
 	nc = int(data.get('nc'))
 	initC = {}
-	initV = {}
-	start = 0
-	found = False
+	initV = {}	
+	usedin = []
+	isValid = 3
 	for i in range(1,nc+1):
 		initC[i] = float(initCl[i-1])
+		if(initC[i]>1 or initC[i]<0):
+			isValid = 2
+			break
 		initV[i] = float(initVl[i-1])
-		if not found and initV[i] > 0:
-			start = i
-			found = True
-	isValid = True
-	for i in range(start,nc-1):
-		if initC[i] < initC[i+1]:
-			isValid = False
+		if(initV[i]<0 or initV[i]>100):
+			isValid = 2
+			break
+		if initV[i] > 0:
+			usedin.append(i)
+	# if not the right range
+	if isValid==0:
+		return isValid, initC, initV
+	# if not decreasing
+	for i in range(len(usedin)-1):
+		if initC[usedin[i]] < initC[usedin[i+1]]:
+			isValid = 1
 			break
 	return isValid, initC, initV

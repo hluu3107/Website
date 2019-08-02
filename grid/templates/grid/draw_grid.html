@@ -219,6 +219,8 @@ $(document).on("click", "#run-btn",function(){
                 $("#error-msg").text("Grid has no input and/or output or it is not connected");
             }else if(data=='1'){
                 $("#error-msg").text("Invalid inlet concentration. Concentration of choosen inlets must be in decreasing order");
+            }else if(data=='2'){
+                $("#error-msg").text("velocity has to be from 0-100, concentration has to be from 0-1");
             }else{
                 $("#error-msg").text("");
                 var g = JSON.parse(data.graph.replace(/(&quot\;)/g,"\""));
