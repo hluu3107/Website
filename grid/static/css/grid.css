@@ -125,6 +125,7 @@ h1 a, h2 a {
     margin-left: auto;
     margin-right: auto;
     display: block;
+    padding-bottom: 20px;
 }
 
 .title-input{
@@ -181,4 +182,8 @@ input[type=number] {
 .pic-tut{
   display: block;
   margin:auto;
+}
+
+.error-msg{
+  padding-bottom: 20px
 }
