@@ -45,7 +45,7 @@ def draw(request):
 	if request.method == 'POST':
     	#if ajax request
 		data = request.session.get('data')
-		postdata = request.POST.copy()
+		postdata = request.POST.copy()		
 		data['graph'] = postdata.get('graph')
 		if postdata.get('status')=='1':
 			#check if graph is connected. 					
@@ -73,6 +73,15 @@ def draw(request):
 				data['resultList'] = resultList
 				data['graph'] = graph
 				return HttpResponse(json.dumps(data))
+		elif postdata.get('status')=='2':
+			isValid, adjMatrix, nEdge = verifyInputGraph(data)
+			nr = int(data.get('nr'))
+			nc = int(data.get('nc'))
+			content = exportToFile(nr,nc,adjMatrix)
+			filename = "mygrid.txt"
+			response = HttpResponse(content, content_type='text/plain')
+			# response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+			return HttpResponse(json.dumps(content))
 	data = request.session.get('data')
 	data["draw"] = request.session['draw']
 	if request.session['draw'] == True:	
@@ -93,3 +102,16 @@ def tutorial(request):
 
 def contact(request):
 	return render(request,'grid/contact.html')
+
+@csrf_exempt
+def download(request):
+	if request.method == 'POST':
+		data = request.session.get('data')
+		postdata = request.POST.copy()
+		data['graph'] = postdata.get('graph')
+		isValid, adjMatrix, nEdge = verifyInputGraph(data)
+		nr = int(data.get('nr'))
+		nc = int(data.get('nc'))
+		content = exportToFile(nr,nc,adjMatrix)
+		return HttpResponse(content)
+	return redirect(user_input)

@@ -55,12 +55,16 @@
     </div>
    
     <div class = "col-sm-6 col-md-6 col-lg-8 col-xl-9">
-        <div id='graph-container'></div>     
+        <div id='graph-container'></div>  
+        <div class = "row justify-content-center btn-download">
+            <button class="btn" id="download-btn">Download Grid File</button>
+        </div>  
     </div>    
 </div>
 
 <script type="text/javascript" src="{% static 'js/sigma.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/FileSaver.min.js' %}"></script>
 <script>
     var raw = "{{data.graph}}";
     var eclickcolor = '#fbaf08';
@@ -182,13 +186,27 @@ $(document).ready(function() {
             $("#out"+stri).css('color', edefaultcolor);                  
         }
     }
-   
-    // for(int i=0;i<nc;i++){
-
-    // }
 });
+
+// write grid geometry to file
+$(document).on("click", "#download-btn",function(){
+    var graph = {
+        'nodes': s.graph.nodes(),
+        'edges': s.graph.edges()
+    }
+    var gdata ={
+        'graph': JSON.stringify(graph)
+    }
+    $.post('/download',gdata,function (data) {
+            var file = new Blob([data], {type: "text/plain;charset=utf-8"});
+            saveAs(file, "mygrid.txt");
+        }
+    );
+});
+
+// check inlet information and compute grid
 $(document).on("click", "#run-btn",function(){
-     var graph = {
+    var graph = {
         'nodes': s.graph.nodes(),
         'edges': s.graph.edges()
     }

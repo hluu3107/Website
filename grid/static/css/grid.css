@@ -187,3 +187,11 @@ input[type=number] {
 .error-msg{
   padding-bottom: 20px
 }
+
+.btn-download{
+  padding-top:50px;
+}
+
+.tut-h{
+  font-size: 25;
+}

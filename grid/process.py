@@ -419,3 +419,12 @@ def validateInlet(data):
 			isValid = 1
 			break
 	return isValid, initC, initV
+
+def exportToFile(nr,nc,adjMatrix):
+	str_list = []
+	str_list.append(str(nr))
+	str_list.append(str(nc))
+	for v,neighbors in adjMatrix.items():
+		cur_row = str(v) + ":" + ",".join(map(str,neighbors))
+		str_list.append(cur_row)
+	return "\n".join(str_list)

@@ -5,4 +5,5 @@ urlpatterns = [
 	path('draw',views.draw,name='draw'),
 	path('tutorial',views.tutorial,name='tutorial'),
 	path('contact',views.contact,name='contact'),
+	path('download',views.download,name='download'),
 ]

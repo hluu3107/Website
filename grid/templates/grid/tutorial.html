@@ -3,12 +3,16 @@
 {% block content %}
 <h2>Tutorial</h2>
 <hr class="mt-0 mb-4">
-<h4>Step 1: Provide parameters</h4>
+<div class="row tut-container text-left justify-content-md-center">
+	<div class="col-8 offset-2 tut-h">
+		Step 1: Provide parameters
+	</div>
+</div>
 <img src="{% static "image/step1.png" %}" height="250"/>
 <div class="row tut-container text-left justify-content-md-center">
 	<div class="col-8 offset-2">
 		<ul>
-			<li>Choose to draw grid or upload text file for grid geometry (the uploaded file need to be in correct format for the parser to work correctly)</li>
+			<li>Choose to draw grid or upload text file for grid geometry (the uploaded file need to be in correct format for the parser to work correctly. For first time user, it is advised to choose draw grid option. After you are done with creating the grid, you can save it as a text file for next time use)</li>
 			<li>If the draw option is choosen: input number of rows (R), columns (C), channel width (w) and length (l) of grid</li>
 			<li>If the grid geometry is provided from file, you do not need to specify number of rows and columns of grid</li>
 			<li>Input diffusion coefficient of your chemicals</li>
@@ -16,7 +20,11 @@
 		</ul>
 	</div>
 </div>
-<h4>Step 2: Provide grid geometry and inlet parameters</h4>
+<div class="row tut-container text-left justify-content-md-center">
+	<div class="col-8 offset-2 tut-h">
+		Step 2: Provide grid geometry and inlet parameters
+	</div>
+</div>
 <div class="row justify-content-md-center">
 	<div class="col-3 offset-1">
 		<img class = "pic-tut" src="{% static "image/step2_2.png" %}"width="200"/>
@@ -36,7 +44,11 @@
 		</ul>
 	</div>
 </div>
-<h4>Step 3: Modify geometry and inlet parameters for desired result</h4>
+<div class="row tut-container text-left justify-content-md-center">
+	<div class="col-8 offset-2 tut-h">
+		Step 3: Modify geometry and inlet parameters for desired result
+	</div>
+</div>
 <div class="row justify-content-md-center">
 	<div class="col-3 offset-1">
 		<img class = "pic-tut" src="{% static "image/step2_4.png" %}"width="200"/>
@@ -52,5 +64,21 @@
 			<li>You can continue to modify the grid and inlet parameters and run again to get new result</li>
 		</ul>
 	</div>
+</div>
+<div class="row tut-container text-left justify-content-md-center">
+	<div class="col-8 offset-2 tut-h">
+		Step 4: Save grid geometry to text file
+	</div>
+</div>
+<div class="row justify-content-md-center">
+	<img class = "pic-tut" src="{% static "image/step4.png" %}"width="250"/>	
+</div>
+<div class="row tut-container text-left justify-content-md-center">
+<div class="col-8 offset-2">
+	<ul>
+		<li>Click Download Grid File to download grid geometry as mygrid.txt in your default download folder. The file has information about grid dimension and geometry.</li>
+		<li>You can use this text file to upload grid geometry in the 1st step</li>
+	</ul>
+</div>
 </div>
 {% endblock %}
