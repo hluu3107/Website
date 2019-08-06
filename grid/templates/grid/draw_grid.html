@@ -44,10 +44,10 @@
             <div class="row align-items-center" id="out{{key}}">
                 <div class= "title-input disable-num col-2">{{key}}</div>
                 <div class="form-group col-5">
-                    <input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
+                    <input  id="vel{{key}}" type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
                 </div>
                 <div class="form-group col-5">
-                    <input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
+                    <input  id="con{{key}}" type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
                 </div>
             </div>
         {% endfor %}  
@@ -254,30 +254,13 @@ $(document).on("click", "#run-btn",function(){
                     s.graph.edges(id).color = g.edges[i]["color"];
                     s.graph.edges(id).selected = g.edges[i]["selected"];
                 }
-                s.refresh();
-                var rdiv = $('#tresult');
-                rdiv.html('');                
+                s.refresh(); 
                 for (i=0;i<data.resultList.length;i++){
-                    if(data.resultList[i][1]!=0){
-                        rdiv.append('<div class="row align-items-center justify-content-center" id="out'+(i+1)+'"><div class = "title-input col-2" style="color:#fbaf08";>'+(i+1)+'</div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="'+data.resultList[i][1].toFixed(2)+
-                        '"></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value="'+data.resultList[i][0].toFixed(2)+'"></div></div>');
-                    }else{
-                        rdiv.append('<div class="row align-items-center justify-content-center" id="out'+(i+1)+'"><div class = "title-input col-2" style="color:#e1e8f0">'+(i+1)+'</div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value=""></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value=""></div></div>');
-                    }                  
+                    if(data.resultList[i][1]!=0){                        
+                        $("#con"+(i+1)).val(data.resultList[i][1].toFixed(2));
+                        $("#vel"+(i+1)).val(data.resultList[i][0].toFixed(2));                      
+                    }          
                 }
-
-        //          {% for key,value in data.initC.items %}
-        //     <div class="row align-items-center" id="out{{key}}">
-        //         <div class= "title-input disable-num col-2">{{key}}</div>
-        //         <div class="form-group col-5">
-        //             <input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
-        //         </div>
-        //         <div class="form-group col-5">
-        //             <input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
-        //         </div>
-        //     </div>
-        // {% endfor %}  
-
             }                
         }   
   });//end click button
