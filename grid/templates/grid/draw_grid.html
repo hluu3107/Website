@@ -117,6 +117,7 @@
                         var outid = "out"+(target%nc);
                     var elem = document.getElementById(outid);
                     elem.style.color = eclickcolor;
+                    console.log("change outlet color");
                 }      
             }else{
                 e.data.edge.color = edefaultcolor;
@@ -161,6 +162,8 @@
         // console.log(lookupNodesByKeyValue(s,'id',e.data.edge.source)[0].color);
         s.refresh();                    
     });
+
+//color inlet and outlet if input is text file
 $(document).ready(function() {
     if("{{data.draw}}"=="False"){
         var adjMatrix = JSON.parse("{{data.adjMatrix}}".replace(/(&quot\;)/g,"\""));        
@@ -255,13 +258,26 @@ $(document).on("click", "#run-btn",function(){
                 var rdiv = $('#tresult');
                 rdiv.html('');                
                 for (i=0;i<data.resultList.length;i++){
-                    if(data.resultList[i][1]!=0){                       
-                        rdiv.append('<div class="row align-items-center justify-content-center"><div class = "title-input col-2" style="color:#fbaf08";>'+(i+1)+'</div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="'+data.resultList[i][1].toFixed(2)+
+                    if(data.resultList[i][1]!=0){
+                        rdiv.append('<div class="row align-items-center justify-content-center" id="out'+(i+1)+'"><div class = "title-input col-2" style="color:#fbaf08";>'+(i+1)+'</div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="'+data.resultList[i][1].toFixed(2)+
                         '"></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value="'+data.resultList[i][0].toFixed(2)+'"></div></div>');
                     }else{
-                          rdiv.append('<div class="row align-items-center justify-content-center"><div class = "title-input col-2" style="color:#e1e8f0">'+(i+1)+'</div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value=""></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value=""></div></div>');
+                        rdiv.append('<div class="row align-items-center justify-content-center" id="out'+(i+1)+'"><div class = "title-input col-2" style="color:#e1e8f0">'+(i+1)+'</div><div class="form-group col-5"><input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value=""></div><div class="form-group col-5"><input type="number" onfocus="this.blur()" readonly class="form-control-plaintext" value=""></div></div>');
                     }                  
                 }
+
+        //          {% for key,value in data.initC.items %}
+        //     <div class="row align-items-center" id="out{{key}}">
+        //         <div class= "title-input disable-num col-2">{{key}}</div>
+        //         <div class="form-group col-5">
+        //             <input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
+        //         </div>
+        //         <div class="form-group col-5">
+        //             <input type="number" readonly="readonly" onfocus="this.blur()" class="form-control-plaintext" value="">
+        //         </div>
+        //     </div>
+        // {% endfor %}  
+
             }                
         }   
   });//end click button
