@@ -260,6 +260,9 @@ $(document).on("click", "#run-btn",function(){
                     if(data.resultList[i][1]!=0){                        
                         $("#con"+(i+1)).val(data.resultList[i][1].toFixed(2));
                         $("#vel"+(i+1)).val(data.resultList[i][0].toFixed(2));                      
+                    }else{
+                        $("#con"+(i+1)).val("");
+                        $("#vel"+(i+1)).val(""); 
                     }          
                 }
             }                
