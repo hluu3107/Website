@@ -258,8 +258,8 @@ $(document).on("click", "#run-btn",function(){
                 s.refresh(); 
                 for (i=0;i<data.resultList.length;i++){
                     if(data.resultList[i][1]!=0){                        
-                        $("#con"+(i+1)).val(data.resultList[i][1].toFixed(2));
-                        $("#vel"+(i+1)).val(data.resultList[i][0].toFixed(2));                      
+                        $("#con"+(i+1)).val(data.resultList[i][0].toFixed(2));
+                        $("#vel"+(i+1)).val(data.resultList[i][1].toFixed(2));                      
                     }else{
                         $("#con"+(i+1)).val("");
                         $("#vel"+(i+1)).val(""); 
