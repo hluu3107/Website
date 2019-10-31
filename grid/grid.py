@@ -236,7 +236,7 @@ class Grid:
 		return result	
 
 def calculateStraight(inGrad, dT, diffCoeff,w):
-	const = 12
+	const = 3
 	#if shape 1
 	if inGrad.a == inGrad.b:
 		return inGrad
@@ -247,6 +247,7 @@ def calculateStraight(inGrad, dT, diffCoeff,w):
 	t = l_diff**2/((const**2)*diffCoeff)
 	lp_diff = const*math.sqrt(diffCoeff*(abs(dT)+t))
 	diff = (lp_diff-l_diff)
+	a_avg = (inGrad.a+inGrad.b)/2
 	#if shape 3 has both head and tail 
 	if shape == 3:	
 		d1p = inGrad.d1-diff
@@ -273,17 +274,17 @@ def calculateStraight(inGrad, dT, diffCoeff,w):
 			result = newResult
 	#if shape 2 linear line
 	elif shape == 2:
-		m = diff
-		ap = inGrad.a+(m*(inGrad.b-inGrad.a))/(w+2*m)
-		bp = inGrad.a+((w+m)*(inGrad.b-inGrad.a))/(w+2*m)
+		a_0 = inGrad.a-a_avg
+		a_new = a_0/(math.e**(dT/(2*t)))
+		ap = a_avg + a_new
+		bp = a_avg - a_new
 		if ap >= bp:
 			result.a = ap
 			result.b = bp			
 		else:
 			#not in correct form ap < bp. return balance form straight line
-			balance = (inGrad.a+inGrad.b)/2
-			result.a = balance
-			result.b = balance	
+			result.a = a_avg
+			result.b = a_avg
 	#if shape 4
 	elif shape == 4:
 		d1p = inGrad.d1-diff
